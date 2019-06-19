@@ -1,0 +1,11 @@
+{
+"Wallet1": "0x20af583E820cC68235D03e00d42b548721bF2Db8",
+"GasPrice": 30000,
+"GasLimit": 30000,
+"Wallet2": "0xF6b7Aef42305A4A24fbD28db9B7376C2267FcD3A",
+"Value": 1,
+"Data_Function": "WorkingHours",
+"Data_Argument": 10,
+"privateKeyW1": "2b7db7222955fb9cb465ae6ff7cb4dc0f9472eb5e4302e93cfbdf8a41275b177"
+
+}
