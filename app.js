@@ -1,20 +1,49 @@
-var Tx = require('ethereumjs-tx')
-const Web3 = require('web3')
-const web3 = new Web3('http://127.0.0.1:7545')
+const Tx = require('ethereumjs-tx');
 
-const account1 = '0xF6b7Aef42305A4A24fbD28db9B7376C2267FcD3A'
-const account2 = '0x20af583E820cC68235D03e00d42b548721bF2Db8'
-
-//Private Keys are a security Risk
-const privateKey1 = '15ef5eb48d8d1a514c7c392483209adbf737e45adb962633240437bfb9352231'
-const privateKey2 = '2b7db7222955fb9cb465ae6ff7cb4dc0f9472eb5e4302e93cfbdf8a41275b177'
-
-const privateKey = new Buffer('e331b6d69882b4cb4ea581d88e0b604039a3de5967688d3dcffdd2270c0fd109', 'hex')
+//Declaration of single variables for Raw Transaction Data
+var iGasPrice;
+var iGasLimit;
+var iToAdress;
+var iValue;
+var iData;           //important for function argument & function selector
+var iPrivateKey = '2b7db7222955fb9cb465ae6ff7cb4dc0f9472eb5e4302e93cfbdf8a41275b177';
 
 
-web3.eth.getBalance(account1, (err, bal) => { console.log('account 1 balance: ', web3.utils.fromWei(bal, 'ether')) })
-web3.eth.getBalance(account2, (err, bal) => { console.log('account 2 balance: ', web3.utils.fromWei(bal, 'ether')) })
+//testing: Test Data initialization within coding
+iGasPrice = 100000;
+iGasLimit = 6721975;
+iToAdress = '0xF6b7Aef42305A4A24fbD28db9B7376C2267FcD3A';
+iValue =    1;
+iData =     'Hallo hier ist eine Test Transaktion input'
+            + 'es geht hier in der zweiten Zeile weiter';
 
+
+
+//transform privateKey for digital Signature of a transaction
+var privateKey = new Buffer(iPrivateKey, 'hex');
+
+//Prepare Raw Data Transaction from input Data
+var rawTx = {
+  gasPrice:   web3.utils.toHex(iGasPrice),
+  gasLimit:   web3.utils.toHex(iGasLimit),
+  to:         iToAdress,
+  value:      web3.utils.toHex(iValue),
+  data:       web3.utils.toHex(iData)
+}
+
+//Process digital Signature
+const tx = new Tx(rawTx);
+tx.sign(privateKey);
+const serializedTx = tx.serialize();
+
+//send SignedTransaction to Blockchain
+web3.eth.sendSignedTransaction('0x'
+      + serializedTx.toString('hex')).on(
+                  'receipt', console.log);
+
+
+
+/* Old Codings:
 
 //transaction without signing
 web3.eth.sendTransaction({ 
@@ -47,3 +76,5 @@ const serializedTx = tx.serialize();
 
 web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'))
 .on('receipt', console.log);
+
+*/
