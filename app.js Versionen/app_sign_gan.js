@@ -17,6 +17,9 @@ var iValue;
 var iData;           //important for function argument & function selector
 var iPrivateKey;
 
+var jsonInputData = require('C:/Users/demoerc/Desktop/beispiel.json');
+console.log("W1: " + jsonInputData.Wallet1);
+
 
 //testing: Test Data initialization within coding
 iGasPrice = 20000000000;
@@ -37,7 +40,7 @@ const data = web3.utils.toHex(iData);
 //all functions in single callback method:
 
 //1st Calculate Nonce:
-web3.eth.getTransactionCount(iFromAdress, (err, txCount) =>
+web3.eth.getTransactionCount(iFromAdress, 'pending',(err, txCount) =>
 {
   //Estimate Gas Price
   web3.eth.estimateGas({ to: iToAdress, data: data}, (err, gasEstimate) => 

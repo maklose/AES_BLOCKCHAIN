@@ -18,20 +18,13 @@ var iData;           //important for function argument & function selector
 var iPrivateKey;
 
 
-
-//PK1:1B56F03913629AD03DA312AD9438A7D119CA17AE664B5588E705CE65D1CD8FFB
-//W1:0x3eC7ef9696d5bbedFf3688Cc76bc3e05A06c7E55
-//PK2: 15EF5EB48D8D1A514C7C392483209ADBF737E45ADB962633240437BFB9352231
-//W2: 0xF6b7Aef42305A4A24fbD28db9B7376C2267FcD3A
-
-
 //testing: Test Data initialization within coding
-iGasPrice = 600000;
+iGasPrice = 60000;
 iGasLimit = 50000;
 iPrivateKey = '15EF5EB48D8D1A514C7C392483209ADBF737E45ADB962633240437BFB9352231';
 iFromAdress = '0xF6b7Aef42305A4A24fbD28db9B7376C2267FcD3A';
 iToAdress = '0x3eC7ef9696d5bbedFf3688Cc76bc3e05A06c7E55';
-iValue = 0.0001;
+iValue = 1;
 iData = 'hier sind ein paar input data';
 
 
@@ -44,7 +37,7 @@ const data = web3.utils.toHex(iData);
 //all functions in single callback method:
 
 //1st Calculate Nonce:
-web3.eth.getTransactionCount(iFromAdress, 'pending',(err, txCount) =>
+web3.eth.getTransactionCount(iFromAdress, (err, txCount) =>
 {
   //Estimate Gas Price
   web3.eth.estimateGas({ to: iToAdress, data: data}, (err, gasEstimate) => 
