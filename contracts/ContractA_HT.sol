@@ -3,13 +3,11 @@ pragma solidity >=0.4.25 <0.6.0;
 
 contract CounterPay1 {
     
-
-
     
     mapping(address => uint256) MachineDeposits;
     mapping(address => uint256) MachineHours;
-    mapping(constant => uint256) ConfirmationMaschine;
-    mapping(constant => uint256) ConfirmationDienstleister;
+    mapping(address => bool) ConfirmationMaschine;
+    mapping(address => bool) ConfirmationDienstleister;
     
     
     function increaseCounter_Balance(uint input)  public payable{
@@ -31,18 +29,39 @@ contract CounterPay1 {
     
     // Wenn Bestätigungen in Form von Data von beiden Teilnehmern eingegangen sind
     // schmeißt der Smart Contract boolean Werte aus
-    
-    function ConfirmationMachine1(uint input) public view {
-       ConfirmationMaschine + 1;    //eventuell smarter dazu noch den Timestamp zu überprüfen
-    }
-    
-    function ConfirmationDienstleister1 (uint input) public view {
-        ConfirmationDienstleister + 1;
-    }
-        
-    function ConfirmMain () public view returns (bool){
-        if (ConfirmationMaschine = 1 & ConfirmationDienstleister = 1) return true;
+    // Versuch 1, einfach das gleiche Prinzip wie mit Maschinenstunden, funktioniert aber nur so halb
+
+    function ConfirmationMaschine1(bool input) public {
+        ConfirmationMaschine[msg.sender] = true;
+}
+
+    function ConfirmationDienstleister1(bool input) public {
+        ConfirmationDienstleister[msg.sender] = true;
+}
+
+    function checkConfirmation(bool) public payable returns (bool) {
+        if (ConfirmationMaschine[msg.sender] = true) return true;
         else return false;
     }
+
+    // Versuch 2, die Maschine und der Dienstleister schreiben beide im data Teil die Bestätigung (bool)
+    // Bedingung ließt beide Tabellen im SC aus und gibt bool-Ergebnis wieder, funktioniert aber noch nicht
     
+    // Um den obigen Code zu compilen und zu deployen muss der untere Teil
+    // von Zeile 50-64 rausgelöscht werden!
+
+     function ConfirmationMaschine1(bool input) public view {
+       ConfirmationMaschine[msg.sender] = true;    //eventuell smarter dazu noch den Timestamp zu überprüfen
+    }
+    
+    function ConfirmationDienstleister1(bool input) public view {
+        ConfirmationDienstleister[msg.sender] = true;
+    }
+        
+    function ConfirmMain() internal view returns (bool){
+        if ((ConfirmationMaschine[msg.sender], true) and (ConfirmationDienstleister[msg.sender], true)) return true;
+    } else 
+    { return false;
+    }
+
 }
