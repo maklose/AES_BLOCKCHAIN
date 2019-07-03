@@ -4,6 +4,7 @@ contract CountAndDeposit {
     
     address contractOwner;
     address contractPartner;
+    address contractAddress;
     mapping(address => uint256) machineBalance;
     mapping(address => uint256) machineCounter;
     uint counterLimit;
@@ -16,8 +17,8 @@ contract CountAndDeposit {
          contractOwner = msg.sender;
      }
      
-     //hier wird der contractPartner definiert
-     //kann nur vom contractPartner definiert werden
+     // hier wird der contractPartner definiert
+     // kann nur vom contractOwner definiert werden
      function setContractPartner(address input) public{
          require (msg.sender == contractOwner);
          contractPartner == input;
@@ -31,10 +32,10 @@ contract CountAndDeposit {
      }
      
 // HIER SIND FUNKTIONEN, UM DEN CONTRACT ZU NUTZEN
-// ALLE INCREASE FUNKTIONEN     
+// INPUT
     // erhöht Counter für Maschinenstunden des owners
     // (also der Maschine, die den Contract angelegt hat)
-    function increaseCounter(uint input) public{
+    function increaseCounter(uint input) public {
         require (msg.sender == contractOwner);
         machineCounter[contractOwner] += input;
     }
@@ -48,11 +49,33 @@ contract CountAndDeposit {
     
 // HIER KANN MAN DEN STATUS DES CONTRACT PRÜFEN
 // ALLE GET FUNKTIONEN
+// OUTPUT
      // gibt counterLimit zurück
      // kann von allen genutzt werden
      function getCounterLimit() public view returns (uint) {
          return counterLimit;
      }
+    
+    // gibt Adresse des contractPartner zurück
+    // kann nur vom contractOwner genutzt werden
+    function getContractPartner() public view returns (address) {
+        require (msg.sender == contractOwner);
+        return contractPartner;
+    }
+    
+     // gibt Adresse des contractPartner zurück
+     // kann nur vom contractOwner genutzt werden
+    function getContractOwner() public view returns (address) {
+        require (msg.sender == contractOwner);
+        return contractOwner;
+    }
+    
+    // gibt Adresse des Contracts zurück
+    // kann nur vom contractOwner genutzt werden
+     function getContractAddress() public view returns (address) {
+        require (msg.sender == contractOwner);
+        return address(this);
+    }
     
     // überprüft und gibt die Balance des owners 
     // (also die Einzahlungen der Maschine) zurück
