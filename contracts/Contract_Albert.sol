@@ -91,7 +91,7 @@ contract CountAndDeposit {
     // true für MachineCounter > Limit
     // false für MachineCounter < Limit
     function checkCounterLimit() public view returns (bool) {
-        if (machineCounter[contractOwner] < counterLimit) return false;
-        else return true;
+        if (machineCounter[contractOwner] >= counterLimit) return true;
+        else return false;
     }
 }
