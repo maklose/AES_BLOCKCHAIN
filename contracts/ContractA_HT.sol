@@ -4,10 +4,11 @@ contract CountAndDeposit {
     
     address contractOwner;
     address contractPartner;
+    address contractAddress;
+    bool ConfirmationMachine;
+    bool ConfirmationDienstleister;
     mapping(address => uint256) machineBalance;
     mapping(address => uint256) machineCounter;
-    mapping(address => bool) ConfirmationMaschine;
-    mapping(address => bool) ConfirmationDienstleister;
     uint counterLimit;
     
     
@@ -18,45 +19,73 @@ contract CountAndDeposit {
          contractOwner = msg.sender;
      }
      
-     //hier wird der contractPartner definiert
-     //kann nur vom contractPartner definiert werden
+     // hier wird der contractPartner definiert
+     // kann nur vom contractOwner definiert werden
      function setContractPartner(address input) public{
          require (msg.sender == contractOwner);
-         contractPartner == input;
+         contractPartner = input;
      }
      
      // legt das Limit für Maschinenstunden fest
      // kann nur vom contractOwner definiert werden
      function setCounterLimit(uint input) public{
          require (msg.sender == contractOwner);
-         counterLimit += input;
+         counterLimit = input;
      }
      
 // HIER SIND FUNKTIONEN, UM DEN CONTRACT ZU NUTZEN
-// ALLE INCREASE FUNKTIONEN     
+// INPUT
     // erhöht Counter für Maschinenstunden des owners
     // (also der Maschine, die den Contract angelegt hat)
-    function increaseCounter(uint input) public returns (bool) {
+    function increaseCounter(uint input) public {
         require (msg.sender == contractOwner);
         machineCounter[contractOwner] += input;
-        if (machineCounter[contractOwner] < counterLimit) return false;
-        else return true;
+    }
+
+    // Maschine schickt Bestätigung an Smart Contract (boolsches Signal)
+    // kann nur von der Maschine ausgeführt werden
+    function setConfirmationMachine(bool input) public {
+        require (msg.sender == contractOwner);
+        ConfirmationMachine = input;
     }
     
-    // erhöht Balance des owners 
-    // (also die Summe der anteiligen Ether-Zahlungen)
-    function increaseBalance(uint input) public payable{
-        require (msg.sender == contractOwner);
-        machineBalance[contractOwner] += msg.value;
+    // Dienstleister schickt Bestätigung an Smart Contract (boolsches Signal)
+    // kann nur vom Dienstleister ausgeführt werden
+    function setConfirmationDienstleister(bool input) public {
+        require (msg.sender == contractPartner);
+        ConfirmationDienstleister = input;
     }
+
     
 // HIER KANN MAN DEN STATUS DES CONTRACT PRÜFEN
 // ALLE GET FUNKTIONEN
+// OUTPUT
      // gibt counterLimit zurück
      // kann von allen genutzt werden
      function getCounterLimit() public view returns (uint) {
          return counterLimit;
      }
+    
+    // gibt Adresse des contractPartner zurück
+    // kann nur vom contractOwner genutzt werden
+    function getContractPartner() public view returns (address) {
+        require (msg.sender == contractOwner);
+        return contractPartner;
+    }
+    
+     // gibt Adresse des contractPartner zurück
+     // kann nur vom contractOwner genutzt werden
+    function getContractOwner() public view returns (address) {
+        require (msg.sender == contractOwner);
+        return contractOwner;
+    }
+    
+    // gibt Adresse des Contracts zurück
+    // kann nur vom contractOwner genutzt werden
+     function getContractAddress() public view returns (address) {
+        require (msg.sender == contractOwner);
+        return address(this);
+    }
     
     // überprüft und gibt die Balance des owners 
     // (also die Einzahlungen der Maschine) zurück
@@ -70,6 +99,16 @@ contract CountAndDeposit {
            return machineCounter[contractOwner];
     }
 
+    // gibt Signal zurück, ob Maschinenbestätigung eingegangen ist, oder nicht
+    function getConfirmationMachine() public view returns (bool) {
+           return ConfirmationMachine;
+    }
+    
+    // gibt Signal zurück, ob Bestätigung des Dienstleisters eingegangen ist, oder nicht
+    function getConfirmationDienstleister() public view returns (bool) {
+           return ConfirmationDienstleister;
+    }
+
     // überprüft, ob das vertraglich festgelegte Limit 
     // der Maschinenstunden (MachineCounter) 
     // erreicht oder überschritten wurde und gibt 
@@ -80,26 +119,5 @@ contract CountAndDeposit {
         else return true;
     }
     
-
-// HIER ÜBERPRÜFEN WIR OB WARTUNGSBESTÄTIGUNG VON DER MASCHINE UND DEM DIENSTLEISTER ERHALTEN WURDE
-    //Alle Funktionen, sowohl Input als auch Output
     
-    // Hier sendet die Maschine die Bestätigung der Wartung an den Smart Contract
-    // Input "true" für Wartung durchgeführt
-    // Input "false" für Wartung nicht durchgeführt
-    function ConfirmationMaschine1(bool input) public {
-    require (msg.sender == contractOwner);
-        ConfirmationMaschine[contractOwner] = input;
-    }
-
-    function ConfirmationDienstleister1(bool input) public {
-        require (msg.sender == contractPartner);
-        ConfirmationDienstleister[contractPartner] = input;
-    }
-
-    function checkConfirmation() public view returns (bool) {
-        if ((ConfirmationMaschine[contractOwner] = true) && (ConfirmationDienstleister[contractPartner] = true)) return true;
-        else return false;
-    }
-
 }
