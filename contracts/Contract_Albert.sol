@@ -21,14 +21,14 @@ contract CountAndDeposit {
      // kann nur vom contractOwner definiert werden
      function setContractPartner(address input) public{
          require (msg.sender == contractOwner);
-         contractPartner == input;
+         contractPartner = input;
      }
      
      // legt das Limit für Maschinenstunden fest
      // kann nur vom contractOwner definiert werden
      function setCounterLimit(uint input) public{
          require (msg.sender == contractOwner);
-         counterLimit += input;
+         counterLimit = input;
      }
      
 // HIER SIND FUNKTIONEN, UM DEN CONTRACT ZU NUTZEN
@@ -38,13 +38,6 @@ contract CountAndDeposit {
     function increaseCounter(uint input) public {
         require (msg.sender == contractOwner);
         machineCounter[contractOwner] += input;
-    }
-    
-    // erhöht Balance des owners 
-    // (also die Summe der anteiligen Ether-Zahlungen)
-    function increaseBalance(uint input) public payable{
-        require (msg.sender == contractOwner);
-        machineBalance[contractOwner] += msg.value;
     }
     
 // HIER KANN MAN DEN STATUS DES CONTRACT PRÜFEN
