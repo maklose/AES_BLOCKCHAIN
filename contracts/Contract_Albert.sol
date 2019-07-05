@@ -8,6 +8,8 @@ contract CountAndDeposit {
     mapping(address => uint256) machineBalance;
     mapping(address => uint256) machineCounter;
     uint counterLimit;
+    uint confOwner;
+    uint confPartner;
     
     
 // HIER DEFINIEREN WIR DEN CONTRACT
@@ -35,9 +37,10 @@ contract CountAndDeposit {
 // INPUT
     // erhöht Counter für Maschinenstunden des owners
     // (also der Maschine, die den Contract angelegt hat)
-    function increaseCounter(uint input) public {
+    function increase(uint input) public payable{
         require (msg.sender == contractOwner);
         machineCounter[contractOwner] += input;
+        machineBalance[contractOwner] +=msg.value;
     }
     
 // HIER KANN MAN DEN STATUS DES CONTRACT PRÜFEN
@@ -88,7 +91,7 @@ contract CountAndDeposit {
     // true für MachineCounter > Limit
     // false für MachineCounter < Limit
     function checkCounterLimit() public view returns (bool) {
-        if (machineCounter[contractOwner] < counterLimit) return false;
-        else return true;
+        if (machineCounter[contractOwner] >= counterLimit) return true;
+        else return false;
     }
 }
