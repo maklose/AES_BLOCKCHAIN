@@ -12,6 +12,7 @@ contract CountAndDeposit {
     uint counterLimit;
     uint confOwner;
     uint confPartner;
+
     
     
 // HIER DEFINIEREN WIR DEN CONTRACT
@@ -20,6 +21,8 @@ contract CountAndDeposit {
      constructor() public {
          contractOwner = msg.sender;
      }
+     
+
      
      // hier wird der contractPartner definiert
      // kann nur vom contractOwner definiert werden
@@ -109,6 +112,14 @@ contract CountAndDeposit {
     // gibt Signal zurück, ob Bestätigung des Dienstleisters eingegangen ist, oder nicht
     function getConfirmationDienstleister() public view returns (bool) {
            return ConfirmationDienstleister;
+    }
+
+    // überprüft, ob von beiden Parteien (Maschine und Dienstleister) die Bestätigungen eingegangen
+    // sind
+    // gibt Ja/Nein Wert aus
+    function checkConfirmation() public view returns (bool) {
+        if (ConfirmationMachine == true && ConfirmationDienstleister == true) return true;
+        else return false;
     }
 
     // überprüft, ob das vertraglich festgelegte Limit 
