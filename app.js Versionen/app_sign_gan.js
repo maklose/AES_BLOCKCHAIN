@@ -1,4 +1,5 @@
 const Tx = require('ethereumjs-tx');
+var fs = require('fs'); //reading/writing JSON files
 
 
 //Callback handling of sent transaction
@@ -11,30 +12,55 @@ var handleReceipt = (error, receipt) => {
 }
 
 //Declaration of single variables for Raw Transaction Data
-var iGasPrice;
-var iGasLimit;
+var iGasPrice = 50000;
+var iGasLimit = 50000;
 var iToAdress;
 var iValue;
-var iData;           //important for function argument & function selector
 var iPrivateKey;
+var errorInputJson = new Boolean(false);
 
-var jsonInputData = require('C:/Users/demoerc/Desktop/Beispiel1.json');
-console.log("W1: " + jsonInputData.Tx1.Wallet1);
+var jsonWorkingHours = 
+  require('C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant 202/To_appjs/WorkHours_SAP2BC.json');
+var jsonConfirmMaintenance;
+console.log("Start read JSON Working Hours");
 
-//testing: Test Data initialization within coding
-iGasPrice = 20000000000;
-iGasLimit = 50000;
-iPrivateKey = '8e9b1bc69ddf2feb5fb710bd863b84fbd218e17bbc39459b7ebcc064041e6fbd';
-iFromAdress = '0xE479b7a82eb2EB5D5586d7696b8D6b29ABbC4db7'; //for getTransactionCount
-iToAdress = '0xF338BAcC14357D20DE065C7d88A5806FeA6df163';
-iValue = 1;
-iData = 'hier sind ein paar input dataasdfasdfasdfasdfaserwearawerfgdafgdsf';
+//Check, if JSON files are empty --> If Yes, raise error
+try{
+
+//Tx Data
+iPrivateKey         = jsonWorkingHours.Tx1.privateKeyW1;
+iFromAdress         = jsonWorkingHours.Tx1.Wallet1; //for function: getTransactionCount
+iToAdress           = jsonWorkingHours.Tx1.Wallet2;
+iValue              = jsonWorkingHours.Tx1.Value;
+
+//General Framework to trigger SmartContract 'IncreaseWorking Hours Function'
+iDataType           = jsonWorkingHours.Tx1.Data.Type;
+iDataFunction       = jsonWorkingHours.Tx1.Data.FunctionSelector;
+iDataInputType      = jsonWorkingHours.Tx1.Data.inputs.type;
+iDataInputName      = jsonWorkingHours.Tx1.Data.inputs.name;
+iDataInputArgument  = jsonWorkingHours.Tx1.Data.inputs.FunctionArgument; //WorkingHours
+
+}
+catch(e){
+  console.log("");
+  console.log("");
+  console.log("!!Error in Input JSON!! No Transactions send to Blockchain!!");
+  console.log("");
+  console.log("");
+  errorInputJson = true;
+}
+
+console.log("error: " + errorInputJson);
+
+if (errorInputJson == true)
+{
+  //Input JSON with errors, no Transaction can be send to Blockchain
+} else {
+//proceed sending Transaction to Blockchain
 
 //prepare values to Hex Code
 const hexGasLimit = web3.utils.toHex(iGasLimit.toString());
 const value = web3.utils.toHex(web3.utils.toWei(iValue.toString(), "ether"));
-const data = web3.utils.toHex(iData);
-
 
 //all functions in single callback method:
 
@@ -42,18 +68,20 @@ const data = web3.utils.toHex(iData);
 web3.eth.getTransactionCount(iFromAdress, 'pending',(err, txCount) =>
 {
   //Estimate Gas Price
-  web3.eth.estimateGas({ to: iToAdress, data: web3.eth.abi.encodeFunctionCall({name: 'riseCounterA', 
-                                                type: 'function', inputs: 
-                                                [{type: 'uint256', name: 'input'}]}, ['6'])}, 
+  web3.eth.estimateGas({ to: iToAdress, data: web3.eth.abi.encodeFunctionCall({name: iDataFunction, 
+                                                type: iDataType, inputs: 
+                                                [{type: jsonWorkingHours.Tx1.Data.inputs.type,
+                                                  name: jsonWorkingHours.Tx1.Data.inputs.name}]}, 
+                                                  [jsonWorkingHours.Tx1.Data.inputs.FunctionArgument.toString()])}, 
   (err, gasEstimate) => 
   {
   //testing: Show Output in Console
   console.log("Output Transaction values:");
   console.log("");
   console.log("GasEstimate: " + gasEstimate);
+  console.log("iGasPrice: " + iGasPrice)
   console.log("hexGasLimit: " + hexGasLimit);
   console.log("Value: " + value);
-  console.log("Data: " + data);
   console.log("Nonce value: " + txCount);
   console.log("");
 
@@ -64,9 +92,11 @@ web3.eth.getTransactionCount(iFromAdress, 'pending',(err, txCount) =>
   gasLimit:   web3.utils.toHex(iGasLimit.toString()),
   to:         iToAdress,
   value:      value,
-  data:       web3.eth.abi.encodeFunctionCall({name: 'riseCounterA', 
-                     type: 'function', inputs: 
-                     [{type: 'uint256', name: 'input'}]}, ['6'])
+  data:       web3.eth.abi.encodeFunctionCall({name: iDataFunction, 
+                  type: iDataType, inputs: 
+                      [{type: jsonWorkingHours.Tx1.Data.inputs.type,
+                        name: jsonWorkingHours.Tx1.Data.inputs.name}]}, 
+                        [jsonWorkingHours.Tx1.Data.inputs.FunctionArgument.toString()])
 };
 
 //digital signature
@@ -79,11 +109,29 @@ const serializedTx = tx.serialize();
 web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), handleReceipt);
 })
 });
+}
 
-//prepare json2SAP interface
-var obj = {table: []};
-obj.table.push({From: iFromAdress, To:iToAdress, Value: iValue});
-var json = JSON.stringify(obj);
-var fs = require('fs');
-fs.writeFile('C:/Users/demoerc/AppData/Roaming/npm/json2SAP/myjsonfile.json', 
-      json, 'utf8', function(err) { if (err) throw err; console.log('complete');});
+
+//Get Maintenance Transactions from Blockchain
+//Call SmartContract to get Working Hours
+
+
+//Prepare Maintenance Transactions to send JSON to SAP
+
+ var obj = {Maintenance1: [], Maintenance2: []};
+ obj.Maintenance1.push({
+    "Machine_Wallet": "0xE479b7a82eb2EB5D5586d7696b8D6b29ABbC4db7",
+    "SmartContract_Adress": "0x5ac12B90f9a6653eE7EdE68c78133B79B67a057C",
+    "Maintenance": "Yes",
+    "WorkingHours_all": 2000
+  });
+obj.Maintenance2.push({
+"Machine_Wallet": "0xE479b7a82eb2EB5D5586d7696b8D6b29ABbC4db7",
+"SmartContract_Adress": "0x5ac12B90f9a6653eE7EdE68c78133B79B67a057C",
+"Maintenance": "Yes",
+"WorkingHours_all": 2000});
+
+ var json = JSON.stringify(obj, null, 2);
+ fs.writeFile('C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant 203/To_SAP/MaintenanceNotification.json', 
+       json, 'utf8', function(err) { if (err) throw err; console.log('complete');});
+
