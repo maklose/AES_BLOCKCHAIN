@@ -9,6 +9,7 @@ var handleReceipt = (error, receipt) => {
   }
 }
 
+
 //Declaration of single variables for Raw Transaction Data
 var iGasPrice;
 var iGasLimit;
