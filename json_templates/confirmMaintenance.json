@@ -1,7 +1,7 @@
 {"confirmation1": {
     "Wallet1": "0xE479b7a82eb2EB5D5586d7696b8D6b29ABbC4db7",
     "privateKeyW1": "8e9b1bc69ddf2feb5fb710bd863b84fbd218e17bbc39459b7ebcc064041e6fbd",
-    "Wallet2": "0x5ac12B90f9a6653eE7EdE68c78133B79B67a057C",
+    "SC_Address": "0x5ac12B90f9a6653eE7EdE68c78133B79B67a057C",
     "Value": 1,
     "Data":
     {
@@ -13,7 +13,7 @@
   "confirmation2": {
     "Wallet1": "0xE479b7a82eb2EB5D5586d7696b8D6b29ABbC4db7",
     "privateKeyW1": "8e9b1bc69ddf2feb5fb710bd863b84fbd218e17bbc39459b7ebcc064041e6fbd",
-    "Wallet2": "0x5ac12B90f9a6653eE7EdE68c78133B79B67a057C",
+    "SC_Address": "0x5ac12B90f9a6653eE7EdE68c78133B79B67a057C",
     "Value": 1,
     "Data":
     {
