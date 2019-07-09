@@ -5,8 +5,8 @@ contract CountAndDeposit {
     address contractOwner;
     address contractPartner;
     address contractAddress;
-    bool ConfirmationMachine;
-    bool ConfirmationDienstleister;
+    bool ConfirmationOwner;
+    bool ConfirmationPartner;
     mapping(address => uint256) machineBalance;
     mapping(address => uint256) machineCounter;
     uint counterLimit;
@@ -50,16 +50,16 @@ contract CountAndDeposit {
     
     // Maschine schickt Bestätigung an Smart Contract (boolsches Signal)
     // kann nur von der Maschine ausgeführt werden
-    function setConfirmationMachine(bool input) public {
+    function setConfirmationOwner(bool input) public {
         require (msg.sender == contractOwner);
-        ConfirmationMachine = input;
+        ConfirmationOwner = input;
     }
     
     // Dienstleister schickt Bestätigung an Smart Contract (boolsches Signal)
     // kann nur vom Dienstleister ausgeführt werden
-    function setConfirmationDienstleister(bool input) public {
+    function setConfirmationPartner(bool input) public {
         require (msg.sender == contractPartner);
-        ConfirmationDienstleister = input;
+        ConfirmationPartner = input;
     }
 
 // HIER KANN MAN DEN STATUS DES CONTRACT PRÜFEN
@@ -71,26 +71,27 @@ contract CountAndDeposit {
          return counterLimit;
      }
     
-    // gibt Adresse des contractPartner zurück
-    // kann nur vom contractOwner genutzt werden
-    function getContractPartner() public view returns (address) {
-        require (msg.sender == contractOwner);
-        return contractPartner;
-    }
+    // LEDIGLICH FÜR TESTZWECKE [bei finalem Deployment nicht mehr im Code]
+        // gibt Adresse des contractPartner zurück
+        // kann nur vom contractOwner genutzt werden
+        function getContractPartner() public view returns (address) {
+            require (msg.sender == contractOwner);
+            return contractPartner;
+        }
     
-     // gibt Adresse des contractPartner zurück
-     // kann nur vom contractOwner genutzt werden
-    function getContractOwner() public view returns (address) {
-        require (msg.sender == contractOwner);
-        return contractOwner;
-    }
+        // gibt Adresse des contractPartner zurück
+        // kann nur vom contractOwner genutzt werden
+        function getContractOwner() public view returns (address) {
+            require (msg.sender == contractOwner);
+            return contractOwner;
+        }
     
-    // gibt Adresse des Contracts zurück
-    // kann nur vom contractOwner genutzt werden
-     function getContractAddress() public view returns (address) {
-        require (msg.sender == contractOwner);
-        return address(this);
-    }
+        // gibt Adresse des Contracts zurück
+        // kann nur vom contractOwner genutzt werden
+        function getContractAddress() public view returns (address) {
+            require (msg.sender == contractOwner);
+            return address(this);
+        }
     
     // überprüft und gibt die Balance des owners 
     // (also die Einzahlungen der Maschine) zurück
@@ -105,20 +106,20 @@ contract CountAndDeposit {
     }
 
     // gibt Signal zurück, ob Maschinenbestätigung eingegangen ist, oder nicht
-    function getConfirmationMachine() public view returns (bool) {
-           return ConfirmationMachine;
+    function getConfirmationOwner() public view returns (bool) {
+           return ConfirmationOwner;
     }
     
     // gibt Signal zurück, ob Bestätigung des Dienstleisters eingegangen ist, oder nicht
-    function getConfirmationDienstleister() public view returns (bool) {
-           return ConfirmationDienstleister;
+    function getConfirmationPartner() public view returns (bool) {
+           return ConfirmationPartner;
     }
 
     // überprüft, ob von beiden Parteien (Maschine und Dienstleister) die Bestätigungen eingegangen
     // sind
     // gibt Ja/Nein Wert aus
     function checkConfirmation() public view returns (bool) {
-        if (ConfirmationMachine == true && ConfirmationDienstleister == true) return true;
+        if (ConfirmationOwner == true && ConfirmationPartner == true) return true;
         else return false;
     }
 
