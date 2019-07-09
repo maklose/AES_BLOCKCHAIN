@@ -1,14 +1,18 @@
-{"Maintenance1": {
-    "Machine_Wallet": "0xE479b7a82eb2EB5D5586d7696b8D6b29ABbC4db7",
-    "SmartContract_Adress": "0x5ac12B90f9a6653eE7EdE68c78133B79B67a057C",
-    "Maintenance": "Yes",
-    "WorkingHours_all": 2000
-  },
-
-  "Maintenance2": {
-    "Machine_Wallet": "0xE479b7a82eb2EB5D5586d7696b8D6b29ABbC4db7",
-    "SmartContract_Adress": "0x5ac12B90f9a6653eE7EdE68c78133B79B67a057C",
-    "Maintenance": "Yes",
-    "WorkingHours_all": 2000
- }
+{
+  "Maintenance1": [
+    {
+      "Machine_Wallet": "0xE479b7a82eb2EB5D5586d7696b8D6b29ABbC4db7",
+      "SmartContract_Adress": "0x5ac12B90f9a6653eE7EdE68c78133B79B67a057C",
+      "Maintenance": "Yes",
+      "WorkingHours_all": 2000
+    }
+  ],
+  "Maintenance2": [
+    {
+      "Machine_Wallet": "0xE479b7a82eb2EB5D5586d7696b8D6b29ABbC4db7",
+      "SmartContract_Adress": "0x5ac12B90f9a6653eE7EdE68c78133B79B67a057C",
+      "Maintenance": "Yes",
+      "WorkingHours_all": 2000
+    }
+  ]
 }

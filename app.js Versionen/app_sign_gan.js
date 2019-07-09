@@ -120,13 +120,13 @@ web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), handleReceip
 
  var obj = {Maintenance1: [], Maintenance2: []};
  obj.Maintenance1.push({
-    "Machine_Wallet": "0xE479b7a82eb2EB5D5586d7696b8D6b29ABbC4db7",
+    "Wallet1": "0xE479b7a82eb2EB5D5586d7696b8D6b29ABbC4db7",
     "SmartContract_Adress": "0x5ac12B90f9a6653eE7EdE68c78133B79B67a057C",
     "Maintenance": "Yes",
     "WorkingHours_all": 2000
   });
 obj.Maintenance2.push({
-"Machine_Wallet": "0xE479b7a82eb2EB5D5586d7696b8D6b29ABbC4db7",
+"Wallet2": "0xE479b7a82eb2EB5D5586d7696b8D6b29ABbC4db7",
 "SmartContract_Adress": "0x5ac12B90f9a6653eE7EdE68c78133B79B67a057C",
 "Maintenance": "Yes",
 "WorkingHours_all": 2000});
