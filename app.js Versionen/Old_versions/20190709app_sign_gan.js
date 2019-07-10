@@ -19,42 +19,10 @@ var iValue;
 var iPrivateKey;
 var errorInputJson = new Boolean(false);
 
-
-//function Selector & Function Argument schöner ausprogrammieren
-
-
-//-------------------------------------------------------------------------------------------------------------------//
-//Create new Smart Contracts
-
-
-/*
-erst json einlesen
-
-1. lalala ausführen
-
-2. dada
-
-3. 
-
-*/
-
-
-
-
-//eingelesene JSON Files von Ordner löschen, damit diese nicht nochmal eingelesen werden
-
-//-------------------------------------------------------------------------------------------------------------------//
-//Booking of Machine Working Hours to specific Smart Contract
-
 var jsonWorkingHours = 
   require('C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_202/To_appjs/WorkHours_SAP2BC.json');
+var jsonConfirmMaintenance;
 console.log("Start read JSON Working Hours");
-
-/*
-für Daniel
-
-*/
-
 
 //Check, if JSON files are empty --> If Yes, raise error
 try{
@@ -148,36 +116,9 @@ web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), handleReceip
 });
 }
 
-//eingelesene JSON Files von Ordner löschen, damit diese nicht nochmal eingelesen werden
+//mehrere Transactions hintereinander erstellen --> hier einbauen
 
 
-
-//-------------------------------------------------------------------------------------------------------------------//
-// Send Maintenenace Conformation to Blockchain
-// Scenario 1: Machine_Wallet to Smart Contract
-// Scenario 2: ContractPartner (CP) to Smart Contract
-
-var jsonConfirmMaintenance;
-/*
-für Daniel
-
-*/
-
-
-
-
-//eingelesene JSON Files von Ordner löschen, damit diese nicht nochmal eingelesen werden
-
-//-------------------------------------------------------------------------------------------------------------------//
-
-/*
-für Daniel
-
-
-*/
-
-
-//Löscht Marvin diese JSON Datei nachm Einlesen?
 
 
 //Get Maintenance Transactions from Blockchain
@@ -203,5 +144,3 @@ obj.Maintenance2.push({
  fs.writeFile('C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_203/To_SAP/MaintenanceNotification.json', 
        json, 'utf8', function(err) { if (err) throw err; console.log('complete');});
 
-
-//-------------------------------------------------------------------------------------------------------------------//
