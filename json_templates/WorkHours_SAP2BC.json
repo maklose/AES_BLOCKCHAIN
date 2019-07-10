@@ -6,7 +6,7 @@
     "Data":
     {
         "Type": "function",
-        "FunctionSelector": "riseCounterA", 
+        "FunctionSelector": "increase", 
         "Inputs": 
         {
             "Type": "uint256",
@@ -24,7 +24,7 @@
     "Data":
     {
         "Type": "function",
-        "FunctionSelector": "riseCounterA", 
+        "FunctionSelector": "increase", 
         "Inputs": 
         {
             "Type": "uint256",
