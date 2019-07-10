@@ -20,7 +20,7 @@ var iPrivateKey;
 var errorInputJson = new Boolean(false);
 
 var jsonWorkingHours = 
-  require('C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_202/To_appjs/WorkHours_SAP2BC.json');
+  require('C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant 202/To_appjs/WorkHours_SAP2BC.json');
 var jsonConfirmMaintenance;
 console.log("Start read JSON Working Hours");
 
@@ -28,17 +28,17 @@ console.log("Start read JSON Working Hours");
 try{
 
 //Tx Data
-iPrivateKey         = jsonWorkingHours.Tx1.PrivateKey_Machine_W;
-iFromAdress         = jsonWorkingHours.Tx1.Machine_Wallet; //for function: getTransactionCount
-iToAdress           = jsonWorkingHours.Tx1.SC_Address;
+iPrivateKey         = jsonWorkingHours.Tx1.privateKeyW1;
+iFromAdress         = jsonWorkingHours.Tx1.Wallet1; //for function: getTransactionCount
+iToAdress           = jsonWorkingHours.Tx1.Wallet2;
 iValue              = jsonWorkingHours.Tx1.Value;
 
 //General Framework to trigger SmartContract 'IncreaseWorking Hours Function'
 iDataType           = jsonWorkingHours.Tx1.Data.Type;
 iDataFunction       = jsonWorkingHours.Tx1.Data.FunctionSelector;
-iDataInputType      = jsonWorkingHours.Tx1.Data.Inputs.Type;
-iDataInputName      = jsonWorkingHours.Tx1.Data.Inputs.Name;
-iDataInputArgument  = jsonWorkingHours.Tx1.Data.Inputs.FunctionArgument; //WorkingHours
+iDataInputType      = jsonWorkingHours.Tx1.Data.inputs.type;
+iDataInputName      = jsonWorkingHours.Tx1.Data.inputs.name;
+iDataInputArgument  = jsonWorkingHours.Tx1.Data.inputs.FunctionArgument; //WorkingHours
 
 }
 catch(e){
@@ -70,9 +70,9 @@ web3.eth.getTransactionCount(iFromAdress, 'pending',(err, txCount) =>
   //Estimate Gas Price
   web3.eth.estimateGas({ to: iToAdress, data: web3.eth.abi.encodeFunctionCall({name: iDataFunction, 
                                                 type: iDataType, inputs: 
-                                                [{type: jsonWorkingHours.Tx1.Data.Inputs.Type,
-                                                  name: jsonWorkingHours.Tx1.Data.Inputs.Name}]}, 
-                                                  [jsonWorkingHours.Tx1.Data.Inputs.FunctionArgument.toString()])}, 
+                                                [{type: jsonWorkingHours.Tx1.Data.inputs.type,
+                                                  name: jsonWorkingHours.Tx1.Data.inputs.name}]}, 
+                                                  [jsonWorkingHours.Tx1.Data.inputs.FunctionArgument.toString()])}, 
   (err, gasEstimate) => 
   {
   //testing: Show Output in Console
@@ -83,11 +83,6 @@ web3.eth.getTransactionCount(iFromAdress, 'pending',(err, txCount) =>
   console.log("hexGasLimit: " + hexGasLimit);
   console.log("Value: " + value);
   console.log("Nonce value: " + txCount);
-  console.log("Data: " + web3.eth.abi.encodeFunctionCall({name: iDataFunction, 
-    type: iDataType, inputs: 
-        [{type: jsonWorkingHours.Tx1.Data.Inputs.Type,
-          name: jsonWorkingHours.Tx1.Data.Inputs.Name}]}, 
-          [jsonWorkingHours.Tx1.Data.Inputs.FunctionArgument.toString()]))
   console.log("");
 
   //Create Transaction Object with raw data
@@ -99,9 +94,9 @@ web3.eth.getTransactionCount(iFromAdress, 'pending',(err, txCount) =>
   value:      value,
   data:       web3.eth.abi.encodeFunctionCall({name: iDataFunction, 
                   type: iDataType, inputs: 
-                      [{type: jsonWorkingHours.Tx1.Data.Inputs.Type,
-                        name: jsonWorkingHours.Tx1.Data.Inputs.Name}]}, 
-                        [jsonWorkingHours.Tx1.Data.Inputs.FunctionArgument.toString()])
+                      [{type: jsonWorkingHours.Tx1.Data.inputs.type,
+                        name: jsonWorkingHours.Tx1.Data.inputs.name}]}, 
+                        [jsonWorkingHours.Tx1.Data.inputs.FunctionArgument.toString()])
 };
 
 //digital signature
@@ -116,10 +111,6 @@ web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), handleReceip
 });
 }
 
-//mehrere Transactions hintereinander erstellen --> hier einbauen
-
-
-
 
 //Get Maintenance Transactions from Blockchain
 //Call SmartContract to get Working Hours
@@ -129,18 +120,18 @@ web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), handleReceip
 
  var obj = {Maintenance1: [], Maintenance2: []};
  obj.Maintenance1.push({
-    "Machine_Wallet": "0xE479b7a82eb2EB5D5586d7696b8D6b29ABbC4db7",
-    "SC_Address": "0x5ac12B90f9a6653eE7EdE68c78133B79B67a057C",
+    "Wallet1": "0xE479b7a82eb2EB5D5586d7696b8D6b29ABbC4db7",
+    "SmartContract_Adress": "0x5ac12B90f9a6653eE7EdE68c78133B79B67a057C",
     "Maintenance": "Yes",
     "WorkingHours_all": 2000
   });
 obj.Maintenance2.push({
-"Machine_Wallet": "0xE479b7a82eb2EB5D5586d7696b8D6b29ABbC4db7",
-"SC_Address": "0x5ac12B90f9a6653eE7EdE68c78133B79B67a057C",
+"Wallet2": "0xE479b7a82eb2EB5D5586d7696b8D6b29ABbC4db7",
+"SmartContract_Adress": "0x5ac12B90f9a6653eE7EdE68c78133B79B67a057C",
 "Maintenance": "Yes",
 "WorkingHours_all": 2000});
 
  var json = JSON.stringify(obj, null, 2);
- fs.writeFile('C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_203/To_SAP/MaintenanceNotification.json', 
+ fs.writeFile('C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant 203/To_SAP/MaintenanceNotification.json', 
        json, 'utf8', function(err) { if (err) throw err; console.log('complete');});
 
