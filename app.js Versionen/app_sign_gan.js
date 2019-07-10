@@ -12,6 +12,7 @@ var handleReceipt = (error, receipt) => {
   }
 }
 
+
 //Declaration of single variables for Raw Transaction Data
 var iGasPrice = 50000;
 var iGasLimit = 50000;
@@ -29,8 +30,6 @@ var filePathMaintenanceTransactionJson = 'C:/Users/demoerc/dropbox_uni/Dropbox/A
 var filePathCPMaintConfJson = 'C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_202/To_appjs/confirmMaintenance.json';
 var filePathMachineMaintConfJson = 'C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_203/To_appjs/confirmMaintenance.json';
 
-
-//function Selector & Function Argument schöner ausprogrammieren
 
 
 //-------------------------------------------------------------------------------------------------------------------//
@@ -61,15 +60,24 @@ web3.eth.sendTransaction({from: accounts0,
 
 5. Return Contract Address to JSON (SAP)
 
-6. eingelesene JSON Files von Ordner löschen, damit diese nicht nochmal eingelesen werden
-
 */
 
+
+//Activate following!!
+//Delete Input JSON File
+//fs.unlink(filePathSCCreationJson, function (err) {});
+//console.log('SC created & initialized, JSON File deleted');
 
 
 
 //-------------------------------------------------------------------------------------------------------------------//
 //Booking of Machine Working Hours to specific Smart Contract
+
+
+
+//while einbauen, der alle WorkingHours einliest und mehrere Tx erstellt
+
+
 
 var jsonWorkingHours = 
   require(filePathWorkHoursJson);
@@ -172,9 +180,9 @@ web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), handleReceip
 
 
 
-//eingelesene Datei löschen!
-//fs.unlink(filePathWorkHoursJson);
-
+//Delete Input JSON File
+fs.unlink(filePathWorkHoursJson, function (err) {});
+console.log('Working Hours Transaction send to Blockchain, JSON File deleted');
 
 //eingelesene JSON Files von Ordner löschen, damit diese nicht nochmal eingelesen werden
 
@@ -224,9 +232,10 @@ warten auf Daniel
 */
 
 
-
-
-//eingelesene JSON Files von Ordner löschen, damit diese nicht nochmal eingelesen werden
+//Activate following!!
+//Delete Input JSON File
+//fs.unlink(filePathCPMaintConfJson, function (err) {});
+//console.log('SC created & initialized, JSON File deleted');
 
 //-------------------------------------------------------------------------------------------------------------------//
 // Send Maintenenace Conformation to Blockchain
@@ -241,6 +250,9 @@ warten auf Daniel
 
 
 
-//eingelesene JSON Files von Ordner löschen, damit diese nicht nochmal eingelesen werden
+//Activate following!!
+//Delete Input JSON File
+//fs.unlink(filePathMachineMaintConfJson, function (err) {});
+//console.log('SC created & initialized, JSON File deleted');
 
 //-------------------------------------------------------------------------------------------------------------------//
