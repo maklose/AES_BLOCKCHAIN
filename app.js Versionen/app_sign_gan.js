@@ -1,9 +1,14 @@
+//-------------------------------------------------------------------------------------------------------------------//
+//Import additional packages
 const Tx = require('ethereumjs-tx');
 var fs = require('fs'); //reading/writing JSON files
 const web3Abi = require('web3-eth-abi');
 
 
-//Callback handling of sent transaction
+//-------------------------------------------------------------------------------------------------------------------//
+//Function Library
+
+//1. Function: Handle Callback of SendSignedTransaction
 var handleReceipt = (error, receipt) => {
   if (error) console.error(error);
   else {
@@ -13,15 +18,82 @@ var handleReceipt = (error, receipt) => {
 }
 
 
+//2. Function: Delete JSON File from Directory
+
+function deleteJSONfile(filePath)
+{
+  //fs.unlink(filePath, function (err) {});
+  console.log('JSON File deleted');
+}
+
+
+//3. Function: SendSignedTransaction
+
+function sendSignedTxToBlockchain(GasPrice, GasLimit, PrivateKey, FromAddress, ToAddress, EthValue, Data)
+{
+  
+//prepare values to Hex Code
+value = web3.utils.toHex(web3.utils.toWei(EthValue.toString(), "ether"));
+
+//1st Calculate Nonce:
+web3.eth.getTransactionCount(FromAddress, 'pending',(err, txCount) =>
+{
+    //Estimate Gas Price
+    web3.eth.estimateGas({ to: ToAddress, data: Data}, 
+    (err, gasEstimate) => 
+    {
+    //testing: Show Output in Console
+    console.log("Output Transaction values:");
+    console.log("");
+    console.log("GasEstimate: " + gasEstimate);
+    console.log("iGasPrice: " + iGasPrice)
+    console.log("hexGasLimit: " + GasLimit);
+    console.log("Value: " + value);
+    console.log("Nonce value: " + txCount);
+    console.log("Data: " + Data);
+    console.log("");
+
+    //Create Transaction Object with raw data
+rawTx = {
+    nonce:      web3.utils.toHex(txCount),
+    gasPrice:   web3.utils.toHex(GasPrice.toString()),
+    gasLimit:   web3.utils.toHex(GasLimit.toString()),
+    to:         ToAddress,
+    value:      value,
+    data:       Data
+  };
+
+  //digital signature
+  privateKey = new Buffer(PrivateKey, 'hex');
+  tx = new Tx(rawTx);
+  tx.sign(privateKey);
+
+  //send signed Transaction to Blockchain
+  serializedTx = tx.serialize();
+  web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), handleReceipt);
+      })
+    });
+}
+
+//-------------------------------------------------------------------------------------------------------------------//
+
+
 //Declaration of single variables for Raw Transaction Data
-var iGasPrice = 50000;
-var iGasLimit = 50000;
-var iToAdress;
+var iGasPrice     = 50000;
+var iGasLimit     = 50000;
+const hexGasLimit = web3.utils.toHex(iGasLimit.toString());
+var iToAddress;
+var iFromAddress;
 var iValue;
+var value;
 var iPrivateKey;
 var iData;
 var errorInputJson = new Boolean(false);
-
+var jsonInputData;
+var privateKey;
+var tx;
+var serializedTx;
+var rawTx;
 
 //Definition of File Paths
 var filePathSCCreationJson = 'C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_202/To_appjs/CreateMaintContract.json';
@@ -31,11 +103,11 @@ var filePathCPMaintConfJson = 'C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exc
 var filePathMachineMaintConfJson = 'C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_203/To_appjs/confirmMaintenance.json';
 
 
-
 //-------------------------------------------------------------------------------------------------------------------//
 //Create new Smart Contracts
 
-var jsonSCCreationJSON = require(filePathSCCreationJson);
+jsonInputData = require(filePathSCCreationJson);
+
 
 /*
 erst json einlesen
@@ -63,56 +135,40 @@ web3.eth.sendTransaction({from: accounts0,
 */
 
 
-//Activate following!!
 //Delete Input JSON File
-//fs.unlink(filePathSCCreationJson, function (err) {});
-//console.log('SC created & initialized, JSON File deleted');
-
-
+deleteJSONfile(filePathSCCreationJson);
+jsonInputData = "";
 
 //-------------------------------------------------------------------------------------------------------------------//
 //Booking of Machine Working Hours to specific Smart Contract
 
 
 
-//while einbauen, der alle WorkingHours einliest und mehrere Tx erstellt
-
-
-
-var jsonWorkingHours = 
+jsonInputData = 
   require(filePathWorkHoursJson);
 console.log("Start read JSON Working Hours");
 
-/*
-1. mehrere Maschinen, mehrere Transaktionen starten von einem SAP
-
-2. FunctionSelector 'increase' testen (mit neuem SmartContract in Ganache deployen)
-
-*/
-
-
-//Check, if JSON files are empty --> If Yes, raise error
 try{
 
 //Tx Data
-iPrivateKey         = jsonWorkingHours.Tx1.PrivateKey_Machine_W;
-iFromAdress         = jsonWorkingHours.Tx1.Machine_Wallet; //for function: getTransactionCount
-iToAdress           = jsonWorkingHours.Tx1.SC_Address;
-iValue              = jsonWorkingHours.Tx1.Value;
+iPrivateKey         = jsonInputData.Tx1.PrivateKey_Machine_W;
+iFromAddress        = jsonInputData.Tx1.Machine_Wallet;
+iToAddress          = jsonInputData.Tx1.SC_Address;
+iValue              = jsonInputData.Tx1.Value;
 
 //General Framework to trigger SmartContract 'IncreaseWorking Hours Function'
-iDataType           = jsonWorkingHours.Tx1.Data.Type;
-iDataFunction       = jsonWorkingHours.Tx1.Data.FunctionSelector;
-iDataInputType      = jsonWorkingHours.Tx1.Data.Inputs.Type;
-iDataInputName      = jsonWorkingHours.Tx1.Data.Inputs.Name;
-iDataInputArgument  = jsonWorkingHours.Tx1.Data.Inputs.FunctionArgument; //WorkingHours
+iDataType           = jsonInputData.Tx1.Data.Type;
+iDataFunction       = jsonInputData.Tx1.Data.FunctionSelector;
+iDataInputType      = jsonInputData.Tx1.Data.Inputs.Type;
+iDataInputName      = jsonInputData.Tx1.Data.Inputs.Name;
+iDataInputArgument  = jsonInputData.Tx1.Data.Inputs.FunctionArgument; //WorkingHours
 
 //build Data Field for Transaction
 iData = web3.eth.abi.encodeFunctionCall({name: iDataFunction, 
   type: iDataType, inputs: 
-  [{type: jsonWorkingHours.Tx1.Data.Inputs.Type,
-    name: jsonWorkingHours.Tx1.Data.Inputs.Name}]}, 
-    [jsonWorkingHours.Tx1.Data.Inputs.FunctionArgument.toString()]);
+  [{type: jsonInputData.Tx1.Data.Inputs.Type,
+    name: jsonInputData.Tx1.Data.Inputs.Name}]}, 
+    [jsonInputData.Tx1.Data.Inputs.FunctionArgument.toString()]);
 
 }
 catch(e){
@@ -132,62 +188,19 @@ if (errorInputJson == true)
 } else {
 //proceed sending Transaction to Blockchain
 
-//prepare values to Hex Code
-const hexGasLimit = web3.utils.toHex(iGasLimit.toString());
-const value = web3.utils.toHex(web3.utils.toWei(iValue.toString(), "ether"));
-
-//all functions in single callback method:
-
-//1st Calculate Nonce:
-web3.eth.getTransactionCount(iFromAdress, 'pending',(err, txCount) =>
-{
-  //Estimate Gas Price
-  web3.eth.estimateGas({ to: iToAdress, data: iData}, 
-  (err, gasEstimate) => 
-  {
-  //testing: Show Output in Console
-  console.log("Output Transaction values:");
-  console.log("");
-  console.log("GasEstimate: " + gasEstimate);
-  console.log("iGasPrice: " + iGasPrice)
-  console.log("hexGasLimit: " + hexGasLimit);
-  console.log("Value: " + value);
-  console.log("Nonce value: " + txCount);
-  console.log("Data: " + iData);
-  console.log("");
-
-  //Create Transaction Object with raw data
-  const rawTx = {
-  nonce:      web3.utils.toHex(txCount),
-  gasPrice:   web3.utils.toHex(iGasPrice.toString()),
-  gasLimit:   web3.utils.toHex(iGasLimit.toString()),
-  to:         iToAdress,
-  value:      value,
-  data:       iData
-};
-
-//digital signature
-var privateKey = new Buffer(iPrivateKey, 'hex');
-const tx = new Tx(rawTx);
-tx.sign(privateKey);
-
-//send signed Transaction to Blockchain
-const serializedTx = tx.serialize();
-web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), handleReceipt);
-})
-});
-}
-
+//Send Transaction with functionality from Function Library
+sendSignedTxToBlockchain(iGasPrice, iGasLimit, iPrivateKey, iFromAddress, iToAddress, 
+  iValue, iData);
 
 
 //Delete Input JSON File
-fs.unlink(filePathWorkHoursJson, function (err) {});
-console.log('Working Hours Transaction send to Blockchain, JSON File deleted');
-
-//eingelesene JSON Files von Ordner löschen, damit diese nicht nochmal eingelesen werden
+deleteJSONfile(filePathWorkHoursJson);
+jsonInputData = "";
 
 //-------------------------------------------------------------------------------------------------------------------//
 //Create Maintenance Notification to SAP (Contract Partner)
+
+//Alle SCs anfrgen, inwieweit Wartung ansteht. Falls Wartung ansteht, folgend Wartungs-JSONs schreiben
 
 /*
 1. Warten auf Daniel
@@ -209,10 +222,10 @@ obj.Maintenance1.push({
    "WorkingHours_all": 2000
  });
 obj.Maintenance2.push({
-"Machine_Wallet": "0xE479b7a82eb2EB5D5586d7696b8D6b29ABbC4db7",
-"SC_Address": "0x5ac12B90f9a6653eE7EdE68c78133B79B67a057C",
-"Maintenance": "Yes",
-"WorkingHours_all": 2000});
+  "Machine_Wallet": "0xE479b7a82eb2EB5D5586d7696b8D6b29ABbC4db7",
+  "SC_Address": "0x5ac12B90f9a6653eE7EdE68c78133B79B67a057C",
+  "Maintenance": "Yes",
+  "WorkingHours_all": 2000});
 
 var json = JSON.stringify(obj, null, 2);
 fs.writeFile(filePathMaintenanceTransactionJson, 
@@ -225,23 +238,22 @@ fs.writeFile(filePathMaintenanceTransactionJson,
 // Scenario 1: Machine_Wallet to Smart Contract
 
 
-var jsonConfirmMaintenanceCP = require(filePathCPMaintConfJson);
+jsonInputData = require(filePathCPMaintConfJson);
 /*
 warten auf Daniel
 
 */
 
 
-//Activate following!!
 //Delete Input JSON File
-//fs.unlink(filePathCPMaintConfJson, function (err) {});
-//console.log('SC created & initialized, JSON File deleted');
+deleteJSONfile(filePathCPMaintConfJson);
+jsonInputData = "";
 
 //-------------------------------------------------------------------------------------------------------------------//
 // Send Maintenenace Conformation to Blockchain
 // Scenario 2: ContractPartner (CP) to Smart Contract
 
-var jsonConfirmMaintenanceMachine = require(filePathMachineMaintConfJson);
+jsonInputData = require(filePathMachineMaintConfJson);
 
 /*
 warten auf Daniel
@@ -250,9 +262,23 @@ warten auf Daniel
 
 
 
-//Activate following!!
 //Delete Input JSON File
-//fs.unlink(filePathMachineMaintConfJson, function (err) {});
-//console.log('SC created & initialized, JSON File deleted');
+deleteJSONfile(filePathMachineMaintConfJson);
+jsonInputData = "";
+
+}
 
 //-------------------------------------------------------------------------------------------------------------------//
+/*  Open Task Section:
+  - While einbauen für Tx1,Tx2,Tx3,... einlesen von WorkingHours
+
+  - Create new Smart Contracts ausprogrammieren
+
+  - FunctionSelector 'increase' testen (mit neuem SmartContract in Ganache deployen)
+
+  - Alle Smart Contracts abfragen, inwieweit eine Wartung ansteht - woher die SC Adressen?
+
+  - Activate fs.unlink(filePath, function (err) {}); in Function Library (damit JSON Files alle gelöscht werden...)
+
+
+*/
