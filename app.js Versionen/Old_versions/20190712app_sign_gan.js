@@ -17,6 +17,7 @@ var handleReceipt = (error, receipt) => {
   }
 }
 
+
 //2. Function: Delete JSON File from Directory
 
 function deleteJSONfile(filePath)
@@ -74,14 +75,6 @@ rawTx = {
     });
 }
 
-function wait(ms)
-{
-var d = new Date();
-var d2 = null;
-do { d2 = new Date(); }
-while(d2-d < ms);
-}
-
 //-------------------------------------------------------------------------------------------------------------------//
 
 
@@ -115,6 +108,31 @@ var filePathMachineMaintConfJson = 'C:/Users/demoerc/dropbox_uni/Dropbox/AES_Fil
 
 jsonInputData = require(filePathSCCreationJson);
 
+
+/*
+erst json einlesen
+
+1. Create Contract via Transaction (warten auf input von Daniel)
+
+2. ContractPartner 
+
+web3.eth.sendTransaction({from: accounts0,
+  to: CaD, data:web3.eth.abi.encodeFunctionCall({name: 'setContractPartner', type: 'function', 
+  inputs: [{type: 'address', name: 'input'}]},[accounts1])}) 
+
+
+3. CounterLimit 
+
+web3.eth.sendTransaction({from: accounts0,
+  to: CaD, data:web3.eth.abi.encodeFunctionCall({name: 'setCounterLimit', type: 'function', 
+  inputs: [{type: 'uint256', name: 'input'}]},['300'])}) 
+
+
+4. MoneyLimit (warten auf Smart Contract) - Geld, das eine Wartung kostet
+
+5. Return Contract Address to JSON (SAP)
+
+*/
 
 
 //Delete Input JSON File

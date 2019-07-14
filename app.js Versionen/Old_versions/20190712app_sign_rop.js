@@ -20,6 +20,8 @@ var iData;           //important for function argument & function selector
 var iPrivateKey;
 
 
+
+
 //PK1:1B56F03913629AD03DA312AD9438A7D119CA17AE664B5588E705CE65D1CD8FFB
 //W1:0x3eC7ef9696d5bbedFf3688Cc76bc3e05A06c7E55
 //PK2: 15EF5EB48D8D1A514C7C392483209ADBF737E45ADB962633240437BFB9352231
@@ -27,19 +29,13 @@ var iPrivateKey;
 
 
 //testing: Test Data initialization within coding
-iGasPrice = 600000000000;
+iGasPrice = 6000000000;
 iGasLimit = 5000000;
-iPrivateKey = 'A4499D09E58AD229EA196A1F89418924872C8587116532626E4CC83A32827AAA';
-iFromAdress = '0x4a59e1612fd9ee2266e0158ee308a2d67ed85273';
-iToAdress = '0x93427e62cF6CDC9259853b075a72fe6f591d3b9C';
-iValue = 0;
-
-
-var iData = web3.eth.abi.encodeFunctionCall({name: 'increase', 
-  type: 'function', inputs: 
-  [{type: 'uint256',
-    name: 'input'}]}, 
-    ['6']);
+iPrivateKey = '50a9e139f828c4c4aa6e1e1c70f502df46bb40c64fcd44418777e053b308e49e';
+iFromAdress = '0xcf20a18cCe3DAeABC4d016C5c1E1827E34465B23';
+iToAdress = '0x7ad6a6c6de318965af9af4a27d72e0cb2975f76c';
+iValue = 1;
+iData = 'hier sind ein paar input data';
 
 var jsonInputData = require('C:/Users/demoerc/Desktop/Beispiel1.json');
 console.log("W1: " + jsonInputData.Tx1.Wallet1);
@@ -47,7 +43,7 @@ console.log("W1: " + jsonInputData.Tx1.Wallet1);
 //prepare values to Hex Code
 const hexGasLimit = web3.utils.toHex(iGasLimit.toString());
 const value = web3.utils.toHex(web3.utils.toWei(iValue.toString(), "ether"));
-//const data = web3.utils.toHex(iData);
+const data = web3.utils.toHex(iData);
 
 
 //all functions in single callback method:
@@ -56,7 +52,9 @@ const value = web3.utils.toHex(web3.utils.toWei(iValue.toString(), "ether"));
 web3.eth.getTransactionCount(iFromAdress, 'pending',(err, txCount) =>
 {
   //Estimate Gas Price
-  web3.eth.estimateGas({ to: iToAdress, data: iData}, (err, gasEstimate) => 
+  web3.eth.estimateGas({ to: iToAdress, data: web3.eth.abi.encodeFunctionCall({name: 'riseCounterA', 
+  type: 'function', inputs: 
+  [{type: 'uint256', name: 'input'}]}, ['6'])}, (err, gasEstimate) => 
   {
   //testing: Show Output in Console
   console.log("Output Transaction values:");
@@ -64,7 +62,7 @@ web3.eth.getTransactionCount(iFromAdress, 'pending',(err, txCount) =>
   console.log("GasEstimate: " + gasEstimate);
   console.log("hexGasLimit: " + hexGasLimit);
   console.log("Value: " + value);
-  console.log("Data: " + iData);
+  console.log("Data: " + data);
   console.log("Nonce value: " + txCount);
   console.log("");
 
@@ -77,7 +75,9 @@ web3.eth.getTransactionCount(iFromAdress, 'pending',(err, txCount) =>
   gasLimit:   web3.utils.toHex(iGasLimit.toString()),
   to:         iToAdress,
   value:      value,
-  data:       iData
+  data:       web3.eth.abi.encodeFunctionCall({name: 'riseCounterA', 
+                type: 'function', inputs: 
+                [{type: 'uint256', name: 'input'}]}, ['6'])
 };
 
 //digital signature
@@ -90,8 +90,6 @@ const serializedTx = tx.serialize();
 web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), handleReceipt);
 })
 });
-
-web3.eth.call({to: iToAdress, data:web3Abi.encodeFunctionSignature('getCount()')},(err, machineCounter) => {var MC = web3.utils.toDecimal(machineCounter); console.log(MC)});
 
 //prepare json2SAP interface
 var obj = {table: []};
