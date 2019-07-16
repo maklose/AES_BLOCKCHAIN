@@ -10,6 +10,7 @@ contract CountAndDeposit {
     mapping(address => uint256) machineBalance;
     mapping(address => uint256) machineCounter;
     uint counterLimit;
+    uint balanceLimit;
     uint confOwner;
     uint confPartner;
 //    string certificate = "address(contractPartner),address(contractOwner),address(contractAddress)";
@@ -38,6 +39,13 @@ contract CountAndDeposit {
          require (msg.sender == contractOwner);
          counterLimit = input;
      }
+     
+     // legt das Limit für Maschinenstunden fest
+     // kann nur vom contractOwner definiert werden
+     function setBalanceLimit(uint input) public{
+         require (msg.sender == contractOwner);
+         balanceLimit = input;
+     } 
      
 // HIER SIND FUNKTIONEN, UM DEN CONTRACT ZU NUTZEN
 // INPUT
@@ -69,9 +77,17 @@ contract CountAndDeposit {
      // gibt counterLimit zurück
      // kann von allen genutzt werden
      function getCounterLimit() public view returns (uint) {
-         return counterLimit;
+        require (msg.sender == contractOwner || msg.sender == contractPartner);
+             return counterLimit;
      }
     
+     // gibt balanceLimit zurück
+     // kann von allen genutzt werden
+     function getBalanceLimit() public view returns (uint) {
+         require (msg.sender == contractOwner || msg.sender == contractPartner);
+             return balanceLimit;
+     }
+     
     // LEDIGLICH FÜR TESTZWECKE [bei finalem Deployment nicht mehr im Code]
         // gibt Adresse des contractPartner zurück
         // kann nur vom contractOwner genutzt werden
@@ -83,36 +99,40 @@ contract CountAndDeposit {
         // gibt Adresse des contractPartner zurück
         // kann nur vom contractOwner genutzt werden
         function getContractOwner() public view returns (address) {
-            require (msg.sender == contractOwner);
+            require (msg.sender == contractOwner || msg.sender == contractPartner);
             return contractOwner;
         }
     
         // gibt Adresse des Contracts zurück
         // kann nur vom contractOwner genutzt werden
         function getContractAddress() public view returns (address) {
-            require (msg.sender == contractOwner);
+            require (msg.sender == contractOwner || msg.sender == contractPartner);
             return address(this);
         }
     
     // überprüft und gibt die Balance des owners 
     // (also die Einzahlungen der Maschine) zurück
     function getBalance() public view returns (uint) {
-        return machineBalance[contractOwner];
+        require (msg.sender == contractOwner || msg.sender == contractPartner);
+            return machineBalance[contractOwner];
     }
     
     // überprüft und gibt den Counter des owners
     // (also die Maschinenstunden der Maschine) zurück
     function getCount() public view returns (uint) {
+        require (msg.sender == contractOwner || msg.sender == contractPartner);
            return machineCounter[contractOwner];
     }
 
     // gibt Signal zurück, ob Maschinenbestätigung eingegangen ist, oder nicht
     function getConfirmationOwner() public view returns (uint) {
+        require (msg.sender == contractOwner || msg.sender == contractPartner);
            return ConfirmationOwner;
     }
     
     // gibt Signal zurück, ob Bestätigung des Dienstleisters eingegangen ist, oder nicht
     function getConfirmationPartner() public view returns (uint) {
+        require (msg.sender == contractOwner || msg.sender == contractPartner);
            return ConfirmationPartner;
     }
 
@@ -120,15 +140,17 @@ contract CountAndDeposit {
     // sind
     // gibt Ja/Nein Wert aus
     function checkConfirmationAndSendPayment() public {
-          if (ConfirmationOwner == 1 && ConfirmationPartner == 1) {
-          contractPartner.transfer(address(this).balance);
+        require (msg.sender == contractOwner || msg.sender == contractPartner);
+         if (ConfirmationOwner == 1 && ConfirmationPartner == 1) {
+         contractPartner.transfer(address(this).balance);
         }
     }
-
+    
     // Checkt das CounterLimit(balance) und sendet automatisch eine Zahlung an den ContractPartner 
     // in Höhe des Smart Contrat Limits
     function checkCounterLimit() public view returns (uint) {
-        if (address(this).balance >= counterLimit) return (1);
+        require (msg.sender == contractOwner || msg.sender == contractPartner);
+        if (address(this).balance >= balanceLimit) return (1);
         else return (0);
-        }
+    }
 }
