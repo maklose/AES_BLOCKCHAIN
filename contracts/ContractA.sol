@@ -13,6 +13,8 @@ contract CountAndDeposit {
     uint balanceLimit;
     uint confOwner;
     uint confPartner;
+    uint stampOwner;
+    uint stampPartner;
 //    string certificate = "address(contractPartner),address(contractOwner),address(contractAddress)";
 
     
@@ -60,16 +62,26 @@ contract CountAndDeposit {
     // Maschine schickt Bestätigung an Smart Contract (boolsches Signal)
     // kann nur von der Maschine ausgeführt werden
     function setConfirmationOwner(uint input) public {
-        require (msg.sender == contractOwner);
+        require (msg.sender == contractOwner && ConfirmationOwner < 1);
         ConfirmationOwner = input;
+        stampOwner = now;
     }
     
     // Dienstleister schickt Bestätigung an Smart Contract (boolsches Signal)
     // kann nur vom Dienstleister ausgeführt werden
     function setConfirmationPartner(uint input) public {
-        require (msg.sender == contractPartner);
+        require (msg.sender == contractPartner && ConfirmationPartner < 1);
         ConfirmationPartner = input;
+        stampPartner = now;
     }
+    
+     function getStampOwner() public view returns (uint) {
+         return stampOwner;
+     }
+     
+     function getStampPartner() public view returns (uint) {
+         return stampPartner;
+     }
 
 // HIER KANN MAN DEN STATUS DES CONTRACT PRÜFEN
 // ALLE GET FUNKTIONEN
