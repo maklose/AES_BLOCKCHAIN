@@ -1,0 +1,17 @@
+{
+    "variables":
+        {
+            "filePathM202_To_appjs": "C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_202/To_appjs/",
+            "filePathM202_To_SAP": "C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_202/To_SAP/",
+            "filePathM203_To_appjs": "C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_203/To_appjs/",
+            "filePathM203_To_SAP": "C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_203/To_SAP/",
+            "SC_GasPrice": 99999999999,
+            "SC_GasLimit": 1500000,
+            "GasPrice":    500000,
+            "GasLimit":    50000,
+            "iValue_0":    0
+            
+        }
+
+
+}
