@@ -2,16 +2,20 @@ pragma solidity >=0.4.25 <0.6.0;
 
 contract CountAndDeposit {
     
-    address contractOwner;
-    address contractPartner;
-    address contractAddress;
-    bool ConfirmationOwner;
-    bool ConfirmationPartner;
+    address payable contractOwner;
+    address payable contractPartner;
+    address payable contractAddress;
+    uint256 ConfirmationOwner;
+    uint256 ConfirmationPartner;
     mapping(address => uint256) machineBalance;
     mapping(address => uint256) machineCounter;
     uint counterLimit;
+    uint balanceLimit;
     uint confOwner;
     uint confPartner;
+    uint stampOwner;
+    uint stampPartner;
+//    string certificate = "address(contractPartner),address(contractOwner),address(contractAddress)";
 
     
     
@@ -26,7 +30,7 @@ contract CountAndDeposit {
      
      // hier wird der contractPartner definiert
      // kann nur vom contractOwner definiert werden
-     function setContractPartner(address input) public{
+     function setContractPartner(address payable input) public{
          require (msg.sender == contractOwner);
          contractPartner = input;
      }
@@ -38,11 +42,18 @@ contract CountAndDeposit {
          counterLimit = input;
      }
      
+     // legt das Limit für Maschinenstunden fest
+     // kann nur vom contractOwner definiert werden
+     function setBalanceLimit(uint input) public{
+         require (msg.sender == contractOwner);
+         balanceLimit = input;
+     } 
+     
 // HIER SIND FUNKTIONEN, UM DEN CONTRACT ZU NUTZEN
 // INPUT
     // erhöht Counter für Maschinenstunden des owners
     // (also der Maschine, die den Contract angelegt hat)
-    function increase(uint input) public payable{
+    function increase(uint256 input) public payable{
         require (msg.sender == contractOwner);
         machineCounter[contractOwner] += input;
         machineBalance[contractOwner] +=msg.value;
@@ -50,17 +61,27 @@ contract CountAndDeposit {
     
     // Maschine schickt Bestätigung an Smart Contract (boolsches Signal)
     // kann nur von der Maschine ausgeführt werden
-    function setConfirmationOwner(bool input) public {
-        require (msg.sender == contractOwner);
+    function setConfirmationOwner(uint input) public {
+        require (msg.sender == contractOwner && ConfirmationOwner < 1);
         ConfirmationOwner = input;
+        stampOwner = now;
     }
     
     // Dienstleister schickt Bestätigung an Smart Contract (boolsches Signal)
     // kann nur vom Dienstleister ausgeführt werden
-    function setConfirmationPartner(bool input) public {
-        require (msg.sender == contractPartner);
+    function setConfirmationPartner(uint input) public {
+        require (msg.sender == contractPartner && ConfirmationPartner < 1);
         ConfirmationPartner = input;
+        stampPartner = now;
     }
+    
+     function getStampOwner() public view returns (uint) {
+         return stampOwner;
+     }
+     
+     function getStampPartner() public view returns (uint) {
+         return stampPartner;
+     }
 
 // HIER KANN MAN DEN STATUS DES CONTRACT PRÜFEN
 // ALLE GET FUNKTIONEN
@@ -68,9 +89,17 @@ contract CountAndDeposit {
      // gibt counterLimit zurück
      // kann von allen genutzt werden
      function getCounterLimit() public view returns (uint) {
-         return counterLimit;
+        require (msg.sender == contractOwner || msg.sender == contractPartner);
+             return counterLimit;
      }
     
+     // gibt balanceLimit zurück
+     // kann von allen genutzt werden
+     function getBalanceLimit() public view returns (uint) {
+         require (msg.sender == contractOwner || msg.sender == contractPartner);
+             return balanceLimit;
+     }
+     
     // LEDIGLICH FÜR TESTZWECKE [bei finalem Deployment nicht mehr im Code]
         // gibt Adresse des contractPartner zurück
         // kann nur vom contractOwner genutzt werden
@@ -82,54 +111,58 @@ contract CountAndDeposit {
         // gibt Adresse des contractPartner zurück
         // kann nur vom contractOwner genutzt werden
         function getContractOwner() public view returns (address) {
-            require (msg.sender == contractOwner);
+            require (msg.sender == contractOwner || msg.sender == contractPartner);
             return contractOwner;
         }
     
         // gibt Adresse des Contracts zurück
         // kann nur vom contractOwner genutzt werden
         function getContractAddress() public view returns (address) {
-            require (msg.sender == contractOwner);
+            require (msg.sender == contractOwner || msg.sender == contractPartner);
             return address(this);
         }
     
     // überprüft und gibt die Balance des owners 
     // (also die Einzahlungen der Maschine) zurück
     function getBalance() public view returns (uint) {
-        return machineBalance[contractOwner];
+        require (msg.sender == contractOwner || msg.sender == contractPartner);
+            return machineBalance[contractOwner];
     }
     
     // überprüft und gibt den Counter des owners
     // (also die Maschinenstunden der Maschine) zurück
     function getCount() public view returns (uint) {
+        require (msg.sender == contractOwner || msg.sender == contractPartner);
            return machineCounter[contractOwner];
     }
 
     // gibt Signal zurück, ob Maschinenbestätigung eingegangen ist, oder nicht
-    function getConfirmationOwner() public view returns (bool) {
+    function getConfirmationOwner() public view returns (uint) {
+        require (msg.sender == contractOwner || msg.sender == contractPartner);
            return ConfirmationOwner;
     }
     
     // gibt Signal zurück, ob Bestätigung des Dienstleisters eingegangen ist, oder nicht
-    function getConfirmationPartner() public view returns (bool) {
+    function getConfirmationPartner() public view returns (uint) {
+        require (msg.sender == contractOwner || msg.sender == contractPartner);
            return ConfirmationPartner;
     }
 
     // überprüft, ob von beiden Parteien (Maschine und Dienstleister) die Bestätigungen eingegangen
     // sind
     // gibt Ja/Nein Wert aus
-    function checkConfirmation() public view returns (bool) {
-        if (ConfirmationOwner == true && ConfirmationPartner == true) return true;
-        else return false;
+    function checkConfirmationAndSendPayment() public {
+        require (msg.sender == contractOwner || msg.sender == contractPartner);
+         if (ConfirmationOwner == 1 && ConfirmationPartner == 1) {
+         contractPartner.transfer(address(this).balance);
+        }
     }
-
-    // überprüft, ob das vertraglich festgelegte Limit 
-    // der Maschinenstunden (MachineCounter) 
-    // erreicht oder überschritten wurde und gibt 
-    // true für MachineCounter > Limit
-    // false für MachineCounter < Limit
-    function checkCounterLimit() public view returns (bool) {
-        if (machineCounter[contractOwner] >= counterLimit) return true;
-        else return false;
+    
+    // Checkt das CounterLimit(balance) und sendet automatisch eine Zahlung an den ContractPartner 
+    // in Höhe des Smart Contrat Limits
+    function checkCounterLimit() public view returns (uint) {
+        require (msg.sender == contractOwner || msg.sender == contractPartner);
+        if (address(this).balance >= balanceLimit) return (1);
+        else return (0);
     }
 }
