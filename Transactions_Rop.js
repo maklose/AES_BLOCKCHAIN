@@ -1,15 +1,18 @@
 // Anwender: Daniel 
 //--------------------------------------------------------------------------------//
 const web3Abi = require('web3-eth-abi')
+const Tx = require('ethereumjs-tx');
 //Ropsten: 
 //1 Accounts:
 //1.1 Maschine:
 var accounts0 = "0x8D56BD123664a754A53ced403c8aF763e15f603C"
+var privateKey0 = "966CDF47C00324FA20F966407F1D15398BF222C6E0056AC8C342BDAACEC6E0C2"
 //1.2 Dienstleister: 
-var accounts1 = "0xcf20a18cCe3DAeABC4d016C5c1E1827E34465B23"
+var accounts1 = "0x6976D2536659d8e922AC7c462a2A5D425baD9c94"
 //1.3 Betrüger: 
-var CaD = "0x8948852e53ac1Fa9Cea7077E133bcED1f471f1d1"
+var accounts2 = "0xE4a19Ec71e3a83065254B61b6b079dc7A2d9c9C8"
 //2 Smart Contracts: 
+var CaD = "0x588faa45a03de10ac104c2fa06a9e8f89099ccc7"
 //2.1 CountAndDeposit:
 //--------------------------------------------------------------------------------//
 //3 Transactions:
@@ -33,7 +36,13 @@ web3.eth.getBalance(CaD).then(function(getBalance){console.log(getBalance);}).ca
 //4.3 Get the current WorkingHours of the Smart Contract
 web3.eth.call({to:CaD, data:web3Abi.encodeFunctionSignature('getCount()')},(err, machineCounter) => {var MC = web3.utils.toDecimal(machineCounter); console.log(MC)});
 //4.4 Show if CounterLimit is already reached
-web3.eth.call({to:CaD, data:web3Abi.encodeFunctionSignature('getConfirmationOwner()')},(err, ConfirmationOwner) => {var CO = web3.utils.toDecimal(ConfirmationOwner); console.log(CO)});
+web3.eth.call({to:CaD, data:web3Abi.encodeFunctionSignature('checkCounterLimit()')})
 //4.5 Show if Owner confirmed
-web3.eth.call({to:CaD, data:web3Abi.encodeFunctionSignature('getConfirmationPartner()')},(err, ConfirmationPartner) => {var CP = web3.utils.toDecimal(ConfirmationPartner); console.log(CP)});
+web3.eth.call({to:CaD, data:web3Abi.encodeFunctionSignature('getConfirmationOwner()')},(err, ConfirmationOwner) => {var CO = web3.utils.toDecimal(ConfirmationOwner); console.log(CO)});
 //4.6 Show if Partner confirmed
+web3.eth.call({to:CaD, data:web3Abi.encodeFunctionSignature('getConfirmationPartner()')},(err, ConfirmationPartner) => {var CP = web3.utils.toDecimal(ConfirmationPartner); console.log(CP)});
+
+
+
+
+
