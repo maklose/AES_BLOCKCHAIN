@@ -74,6 +74,11 @@ web3.eth.sendTransaction({
      ['1'])
     })
 //3.7 Check Confirmation and Send 
+web3.eth.sendTransaction({
+    from: accounts1,
+    to: CaD,data:web3Abi.encodeFunctionSignature('checkConfirmationAndSendPayment()')
+})
+
 //--------------------------------------------------------------------------------//
 //4 Calls: 
 //4.1 Get value of the Counterlimit

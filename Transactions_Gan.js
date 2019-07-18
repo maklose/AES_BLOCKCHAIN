@@ -24,13 +24,15 @@ web3.eth.sendTransaction({from: accounts0,to: CaD, data:web3.eth.abi.encodeFunct
 web3.eth.sendTransaction({from: accounts0,to: CaD,data:web3.eth.abi.encodeFunctionCall({name: 'setCounterLimit', type: 'function', inputs: [{type: 'uint256', name: 'input'}]},['300'])})
 //3.3 Define BalanceLimit 
 web3.eth.sendTransaction({from: accounts0,to: CaD,data:web3.eth.abi.encodeFunctionCall({name: 'setBalanceLimit', type: 'function', inputs: [{type: 'uint256', name: 'input'}]},['2'])})
+//2000000000000000000
 //3.4 Increase Balance of Smart Contract and Working Hours
 web3.eth.sendTransaction({from: accounts0, to: CaD, value: web3.utils.toWei('1', 'ether'), data:web3.eth.abi.encodeFunctionCall({name: 'increase', type: 'function', inputs: [{type: 'uint256', name: 'input'}]},['200'])})
 //3.5 Confirmatation of the Owner
 web3.eth.sendTransaction({from: accounts0, to: CaD, data:web3.eth.abi.encodeFunctionCall({name: 'setConfirmationOwner', type: 'function', inputs: [{type: 'uint256', name: 'input'}]}, ['1']) })
 //3.6 Confirmatation of the Partner
-web3.eth.sendTransaction({from: accounts1,to: CaD, data:web3.eth.abi.encodeFunctionCall({name: 'setConfirmationOwner', type: 'function', inputs: [{type: 'uint256', name: 'input'}]}, ['1'])})
+web3.eth.sendTransaction({from: accounts1,to: CaD, data:web3.eth.abi.encodeFunctionCall({name: 'setConfirmationPartner', type: 'function', inputs: [{type: 'uint256', name: 'input'}]}, ['1'])})
 //3.7 Check Confirmation and Send 
+web3.eth.sendTransaction({from: accounts1,to: CaD,data:web3Abi.encodeFunctionSignature('checkConfirmationAndSendPayment()')})
 //--------------------------------------------------------------------------------//
 //4 Calls: 
 //4.1 Get value of the Counterlimit
