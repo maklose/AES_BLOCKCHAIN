@@ -8,7 +8,7 @@
 // Transaction: (Deploy), Partner, Counter Limit, Balance Limit, increase, Confirmation Owner, Confirmation Partner
 // Call: stamp Owner, stamp Partner, Counter Limit, Balance Limit, Balance , Count, Confirmation Owner, Confirmation Partner, Check Balance Limit 
 //--------------------------------------------------------------------------------//
-//TODO: Check Confirmation and Send 
+// TODO: Check Confirmation and Send 
 //--------------------------------------------------------------------------------//
 const web3Abi = require('web3-eth-abi')
 const Tx = require('ethereumjs-tx');
