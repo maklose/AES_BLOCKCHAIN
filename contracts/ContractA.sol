@@ -25,7 +25,6 @@ contract CountAndDeposit {
      constructor() public {
          contractOwner = msg.sender;
      }
-     
 
 // HIER DEFINIEREN WIR UNSERE INPUT VARIABLEN     
      // hier wird der contractPartner definiert
@@ -91,7 +90,7 @@ contract CountAndDeposit {
      // gibt counterLimit zurück
      // kann von allen genutzt werden
      function getCounterLimit() public view returns (uint) {
-             require (msg.sender == contractOwner || msg.sender == contractPartner);
+             require (msg.sender == contractOwner);
              return counterLimit;
      }
     
@@ -171,4 +170,12 @@ contract CountAndDeposit {
         if (address(this).balance >= balanceLimit) return (1);
         else return (0);
     }
+    
+// AB HIER BEGINNT DER CODE FÜR DAS ZERTIFIKAT 
+    // Erst werden die Adressen auf Typ uint gemappt
+    // Dann werden alle Zertifikatsbezogenen Werte in einer Funktion ausgegeben
+    //function getCertificate() public view returns (uint) {
+    //mapping (address =)
+    //return contractOwner;
+    //}
 }
