@@ -90,7 +90,7 @@ contract CountAndDeposit {
      // gibt counterLimit zurück
      // kann von allen genutzt werden
      function getCounterLimit() public view returns (uint) {
-             require (msg.sender == contractOwner);
+             require (msg.sender == contractOwner || msg.sender == contractPartner);
              return counterLimit;
      }
     
