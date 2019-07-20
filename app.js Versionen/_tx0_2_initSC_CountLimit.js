@@ -103,7 +103,7 @@ var rawTx;
 
 
 //-------------------------------------------------------------------------------------------------------------------//
-//initialize new Smart Contracts --> set ContractPartner
+//initialize new Smart Contracts --> set CounterLimit (for Working Hours)
 
 jsonInputData = require(filePathCreateSC);
 jsonSCAddress = require(filePathNewSCaddr);
@@ -118,6 +118,7 @@ try {
     console.log("iToAddress: " + iToAddress);
     console.log("iFromAddress: " + iFromAddress);
     console.log("iPrivateKey: " + iPrivateKey);
+    console.log("iCounterLimitHours: " + iCounterLimitHours);
 
 }
 catch (e) {

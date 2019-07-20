@@ -78,7 +78,7 @@ function sendSignedTxToBlockchain(GasPrice, GasLimit, PrivateKey, FromAddress, T
 var configInput = require('C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_202/To_appjs/appjs_config.json');
 var filePathNewSCaddr = configInput.variables.filePathM202_To_SAP + 'newSC_Address_appjs.json';
 var filePathCreateSC = configInput.variables.filePathM202_To_appjs + 'CreateMaintContract.json';
-
+var iValue_0 = configInput.variables.iValue_0;
 
 //Declaration of single variables for Raw Transaction Data
 var GasPrice = configInput.variables.SC_GasPrice;
@@ -88,7 +88,6 @@ var GasLimit = configInput.variables.SC_GasLimit;
 var iToAddress;
 var iFromAddress;
 var iContractPartner;
-var iValue;
 var value;
 var iPrivateKey;
 var iData;
@@ -114,12 +113,10 @@ try {
     iFromAddress = jsonInputData.NewContract.Machine_Wallet;
     iPrivateKey = jsonInputData.NewContract.PrivateKey_Machine_W;
     iContractPartner = jsonInputData.NewContract.CP_Wallet;
-    iMaintenanceCost = jsonInputData.NewContract.MaintenanceCost;
-    iCounterLimitHours = jsonInputData.NewContract.CounterLimitHours;
-    iValue = 0;
+    iValue_0 = 0;
 
     console.log("iToAddress: " + iToAddress);
-    console.log("iFromAddress" + iFromAddress);
+    console.log("iFromAddress: " + iFromAddress);
     console.log("iPrivateKey: " + iPrivateKey);
     console.log("CP: " + iContractPartner);
 
@@ -144,7 +141,7 @@ if (errorInputJson == true) {
         inputs: [{ type: 'address', name: 'input' }]
     }, [iContractPartner]);
     sendSignedTxToBlockchain(GasPrice, GasLimit, iPrivateKey, iFromAddress, iToAddress,
-        iValue, iData);
+        iValue_0, iData);
 }
 
 /** 

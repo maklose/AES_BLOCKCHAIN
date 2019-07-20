@@ -80,7 +80,7 @@ var configInput = require('C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchang
 var filePathMaintenanceTransactionJson = configInput.variables.filePathM203_To_SAP
    + 'MaintenanceNotification.json';
 var filePathSCaddressesToCheck = configInput.variables.filePathM202_To_appjs
-   + 'Maint_request_V2.json';
+   + 'Maint_request.json';
 
 
 //Declaration of single variables for Raw Transaction Data
@@ -114,9 +114,7 @@ jsonInputData = require(filePathSCaddressesToCheck);
 
 try {
    //txInputData
-   iToAddress = jsonInputData.SmartContract1.SC_Address;
-   iFromAddress = jsonInputData.SmartContract1.Machine_Wallet;
-   iPrivateKey = jsonInputData.SmartContract1.PrivateKey_Machine_W;
+   iToAddress = jsonInputData.SmartContracts.SC_Address1;
 
    console.log("iToAddress: " + iToAddress);
 
@@ -136,22 +134,23 @@ if (errorInputJson == true) {
    //proceed sending initializing Transactions to SC
 
    //Define ContractPartner
-   web3.eth.call({ from: iFromAddress, to: iToAddress, data: web3Abi.encodeFunctionSignature('checkCounterLimit()') },
+   web3.eth.call({ to: iToAddress, data: web3Abi.encodeFunctionSignature('checkCounterLimit()') },
       (err, result) => {
          console.log("result Maint: " + result);
 
-         if (result == '0x0000000000000000000000000000000000000000000000000000000000000000') {
+         result = '0x1';
+
+         if (result == '0x') {
             console.log("No Maintenance neccessary!");
          } else {
 
             //Get Contract Owner / Machine Wallet
-            web3.eth.call({ from: iFromAddress, to: iToAddress, data: web3Abi.encodeFunctionSignature('getContractOwner()') },
+            web3.eth.call({ to: iToAddress, data: web3Abi.encodeFunctionSignature('getContractOwner()') },
                (err, contractOwnerWallet) => {
                   console.log("contractOwnerWallet: " + contractOwnerWallet);
 
                   //get Counter Limit for Logging
                   web3.eth.call({
-                     from: iFromAddress,
                      to: iToAddress,
                      data: web3Abi.encodeFunctionSignature('getCounterLimit()')
                   },
@@ -162,7 +161,6 @@ if (errorInputJson == true) {
 
                         //Get current count of Working Hours
                         web3.eth.call({
-                           from: iFromAddress,
                            to: iToAddress,
                            data: web3Abi.encodeFunctionSignature('getCount()')
                         },
@@ -178,7 +176,7 @@ if (errorInputJson == true) {
                               var obj = { Maintenance1: [] };
                               obj.Maintenance1.push({
                                  "Machine_Wallet": contractOwnerWallet,
-                                 "SC_Address": iToAddress,
+                                 "SC_Address": "0x5ac12B90f9a6653eE7EdE68c78133B79B67a057C",
                                  "Maintenance": "Yes",
                                  "WorkingHours_all": countedWorkingHours
                               });
@@ -197,10 +195,28 @@ if (errorInputJson == true) {
 
    //check Maintenance Confirmation at SCs at trigger payment (if SC check is ok)
 
+   //Get Contract Owner / Machine Wallet
+   web3.eth.call({ to: iToAddress, data: web3Abi.encodeFunctionSignature('getContractOwner()') },
+      (err, contractOwnerWallet) => {
 
-   iData = web3Abi.encodeFunctionSignature('checkConfirmationAndSendPayment()');
-   sendSignedTxToBlockchain(GasPrice, GasLimit, iPrivateKey, iFromAddress, iToAddress,
-      iValue_0, iData);
+
+
+
+
+         //TestData:
+         iPrivateKey = '8e9b1bc69ddf2feb5fb710bd863b84fbd218e17bbc39459b7ebcc064041e6fbd';
+         iFromAddress = '0xE479b7a82eb2EB5D5586d7696b8D6b29ABbC4db7';
+
+
+
+
+
+
+         iData = web3Abi.encodeFunctionSignature('checkConfirmationAndSendPayment()');
+         sendSignedTxToBlockchain(GasPrice, GasLimit, iPrivateKey, iFromAddress, iToAddress,
+            iValue_0, iData);
+
+      });
 
    //delete input JSON file with input SC addresses
    deleteJSONfile(filePathSCaddressesToCheck);

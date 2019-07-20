@@ -78,11 +78,11 @@ function sendSignedTxToBlockchain(GasPrice, GasLimit, PrivateKey, FromAddress, T
 var configInput = require('C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_202/To_appjs/appjs_config.json');
 var filePathNewSCaddr = configInput.variables.filePathM202_To_SAP + 'newSC_Address_appjs.json';
 var filePathCreateSC = configInput.variables.filePathM202_To_appjs + 'CreateMaintContract.json';
+var iValue_0 = configInput.variables.iValue_0;
 
 //Declaration of single variables for Raw Transaction Data
 var GasPrice = configInput.variables.SC_GasPrice;
 var GasLimit = configInput.variables.SC_GasLimit;
-var iValue_0 = configInput.variables.iValue_0;
 
 
 var iToAddress;

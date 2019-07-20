@@ -141,12 +141,12 @@ if (errorInputJson == true) {
     sendSignedTxToBlockchain(GasPrice, GasLimit, iPrivateKey, iFromAddress, iToAddress,
         iValue_0, iData);
     
-        console.log("ContractPartner/Service Provider has confirmed Maintenance "
+        console.log("Machine has confirmed Maintenance "
             + "via JSON file. Confirmation Transaction send to Smart Contract!");
 
     //delete input JSON file
     deleteJSONfile(filePathMachineMaintConfJson);
-    console.log("SC deployment & initialization finished. JSON input deleted!");
+    
     }else{
         console.log("JSON Maintenance Confirmation found, but Maintenance " + 
          "has not been confirmed within this file. No Transaction send to Smart Contract");
