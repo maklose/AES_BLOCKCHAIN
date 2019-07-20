@@ -8,7 +8,7 @@
 // Transaction: (Deploy), Partner, Counter Limit, Balance Limit, increase, Confirmation Owner, Confirmation Partner
 // Call: stamp Owner, stamp Partner, Counter Limit, Balance Limit, Balance , Count, Confirmation Owner, Confirmation Partner, Check Balance Limit 
 //--------------------------------------------------------------------------------//
-//TODO: Check Confirmation and Send 
+// TODO: Check Confirmation and Send 
 //--------------------------------------------------------------------------------//
 const web3Abi = require('web3-eth-abi')
 const Tx = require('ethereumjs-tx');
@@ -74,6 +74,11 @@ web3.eth.sendTransaction({
      ['1'])
     })
 //3.7 Check Confirmation and Send 
+web3.eth.sendTransaction({
+    from: accounts1,
+    to: CaD,data:web3Abi.encodeFunctionSignature('checkConfirmationAndSendPayment()')
+})
+
 //--------------------------------------------------------------------------------//
 //4 Calls: 
 //4.1 Get value of the Counterlimit
