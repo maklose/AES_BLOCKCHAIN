@@ -167,15 +167,7 @@ contract CountAndDeposit {
     // in Höhe des Smart Contrat Limits
     function checkCounterLimit() public view returns (uint) {
         require (msg.sender == contractOwner || msg.sender == contractPartner);
-        if (address(this).balance >= balanceLimit) return (1);
+        if ((address(this).balance >= balanceLimit) && (balanceLimit != 0)) return (1);
         else return (0);
     }
-    
-// AB HIER BEGINNT DER CODE FÜR DAS ZERTIFIKAT 
-    // Erst werden die Adressen auf Typ uint gemappt
-    // Dann werden alle Zertifikatsbezogenen Werte in einer Funktion ausgegeben
-    //function getCertificate() public view returns (uint) {
-    //mapping (address =)
-    //return contractOwner;
-    //}
 }
