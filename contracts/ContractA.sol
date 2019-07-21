@@ -152,11 +152,11 @@ contract CountAndDeposit {
     // überprüft, ob von beiden Parteien (Maschine und Dienstleister) die Bestätigungen eingegangen
     // sind
     // gibt Ja/Nein Wert aus
-    function checkConfirmationAndSendPayment() public {
+    function checkConfirmationAndSendPayment() public returns (address, address, address, uint256, uint256, uint, uint, uint) {
          require (msg.sender == contractOwner || msg.sender == contractPartner);
          if (ConfirmationOwner == 1 && ConfirmationPartner == 1 && ((address(this).balance / 10**18) >= balanceLimit) && (balanceLimit != 0)) {
          contractPartner.transfer(address(this).balance);
-         CountAndDeposit.getCertificate;
+         return (contractOwner, contractPartner, address(this), ConfirmationOwner, ConfirmationPartner, counterLimit, stampOwner, stampPartner);
         }
     }
     
