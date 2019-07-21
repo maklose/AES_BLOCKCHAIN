@@ -206,3 +206,51 @@ contract CountAndDeposit {
     }
 
 }
+
+
+
+
+contract PayPerUse {
+    
+    address payable machineOwner;
+    address payable machineUser;
+    address payable contractAddress;
+    mapping(address => uint256) machineBalance;
+    mapping(address => uint256) machineCounter;
+    
+    
+    // HIER DEFINIEREN WIR DEN CONTRACT
+     // hier wird der contractOwner definiert
+     // geschieht bei der Erstellung der Contract-Instanz
+     constructor() public {
+         machineOwner = msg.sender;
+     }
+     
+     // HIER DEFINIEREN WIR UNSERE INPUT VARIABLEN     
+     // hier wird der contractPartner definiert
+     // kann nur vom contractOwner definiert werden
+     function setMachineUser(address payable input) public {
+         require (msg.sender == machineOwner);
+         machineUser = input;
+     }
+     
+    // HIER SIND FUNKTIONEN, UM DEN CONTRACT ZU NUTZEN
+    // INPUT
+    // erhöht Counter für Maschinenstunden des owners
+    // (also der Maschine, die den Contract angelegt hat)
+    function increase(uint256 input) public payable {
+        require (msg.sender == machineUser);
+        machineCounter[machineUser] += input;
+        machineBalance[machineUser] +=msg.value; //notwendig??
+    }
+    
+    
+    CountAndDeposit cd;
+    
+    function getMachineHours(address _contractAddress) public returns (uint) {
+        cd = CountAndDeposit(_contractAddress);
+        return cd.getCount();
+    }
+    
+    
+}
