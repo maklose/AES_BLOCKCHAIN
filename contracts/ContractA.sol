@@ -168,7 +168,7 @@ contract CountAndDeposit {
     // in Höhe des Smart Contrat Limits
     function checkBalanceLimit() public view returns (uint) {
         require (msg.sender == contractOwner || msg.sender == contractPartner);
-        if ((address(this).balance >= balanceLimit) && (balanceLimit != 0)) return (1);
+        if ((address(this).balance >= (balanceLimit / 10**18)) && (balanceLimit != 0)) return (1);
         else return (0);
     }
     
