@@ -83,12 +83,14 @@ web3.eth.sendTransaction({
 //4 Calls: 
 //4.1 Get value of the Counterlimit
 web3.eth.call({
+    from: accounts0,
     to: CaD, 
     data:web3Abi.encodeFunctionSignature('getCounterLimit()')},
     (err, counterLimit) => {var CL = web3.utils.toDecimal(counterLimit); console.log(CL)
     });
 //4.2 Get value of the BalanceLimit 
 web3.eth.call({
+    from: accounts0,
     to: CaD, 
     data:web3Abi.encodeFunctionSignature('getBalanceLimit()')},
     (err, balanceLimit) => {var BL = web3.utils.toDecimal(balanceLimit); console.log(BL)
@@ -97,33 +99,39 @@ web3.eth.call({
 web3.eth.getBalance(CaD).then(function(getBalance){console.log(getBalance);}).catch(function(e){console.log(e);});
 //4.4 Get the current WorkingHours of the Smart Contract
 web3.eth.call({
+    from: accounts0,
     to:CaD, 
     data:web3Abi.encodeFunctionSignature('getCount()')},
     (err, machineCounter) => {var MC = web3.utils.toDecimal(machineCounter); console.log(MC)
     });
-//4.5 Show if CounterLimit is already reached
+//4.5 Show if BalanceLimit is already reached
 web3.eth.call({
+    from: accounts0,
     to:CaD, 
-    data:web3Abi.encodeFunctionSignature('checkCounterLimit()')})
+    data:web3Abi.encodeFunctionSignature('checkBalanceLimit()')})
 //4.6 Show if Owner confirmed
 web3.eth.call({
+    from: accounts0,
     to:CaD, 
     data:web3Abi.encodeFunctionSignature('getConfirmationOwner()')},
     (err, ConfirmationOwner) => {var CO = web3.utils.toDecimal(ConfirmationOwner); console.log(CO)});
 //4.7 Show if Partner confirmed
 web3.eth.call({
+    from: accounts0,
     to:CaD, 
     data:web3Abi.encodeFunctionSignature('getConfirmationPartner()')},
     (err, ConfirmationPartner) => {var CP = web3.utils.toDecimal(ConfirmationPartner); console.log(CP)
     });
 //4.8 get Stamp of Contract Owner 
 web3.eth.call({
+    from: accounts0,
     to:CaD, 
     data:web3Abi.encodeFunctionSignature('getStampOwner()')},
     (err, stampOwner) => {var SO = web3.utils.toDecimal(stampOwner); console.log(SO)
     });
 //4.9 get Stamp of Contract Partner 
 web3.eth.call({
+    from: accounts0,
     to:CaD, 
     data:web3Abi.encodeFunctionSignature('getStampPartner()')},
     (err, stampPartner) => {var SP = web3.utils.toDecimal(stampPartner); console.log(SP)
