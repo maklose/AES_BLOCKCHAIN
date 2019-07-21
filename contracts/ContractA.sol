@@ -1,4 +1,4 @@
-pragma solidity >=0.4.25 <0.6.0;
+pragma solidity >=0.4.25 <0.7.0;
 
 contract CountAndDeposit {
     
@@ -156,6 +156,7 @@ contract CountAndDeposit {
          require (msg.sender == contractOwner || msg.sender == contractPartner);
          if (ConfirmationOwner == 1 && ConfirmationPartner == 1) {
          contractPartner.transfer(address(this).balance);
+         CountAndDeposit.getCertificate;
         }
     }
     
@@ -163,11 +164,21 @@ contract CountAndDeposit {
 // Certificate muss noch genau dargestellt und in Funkltion eingebaut werden
     
     
-    // Checkt das CounterLimit(balance) und sendet automatisch eine Zahlung an den ContractPartner 
+    // Checkt das BalanceLimit(balance) und sendet automatisch eine Zahlung an den ContractPartner 
     // in Höhe des Smart Contrat Limits
-    function checkCounterLimit() public view returns (uint) {
+    function checkBalanceLimit() public view returns (uint) {
         require (msg.sender == contractOwner || msg.sender == contractPartner);
         if ((address(this).balance >= balanceLimit) && (balanceLimit != 0)) return (1);
         else return (0);
+    }
+    
+    
+// AB HIER BEGINNT DER CODE FÜR DAS ZERTIFIKAT 
+    // Erst werden die Adressen auf Typ uint gemappt
+    // Dann werden alle Zertifikatsbezogenen Werte in einer Funktion ausgegeben
+    function getCertificate() public view 
+        returns (address, address, address, uint256, uint256, uint, uint, uint) {
+            
+        return (contractOwner, contractPartner, contractAddress, ConfirmationOwner, ConfirmationPartner, counterLimit, stampOwner, stampPartner);
     }
 }
