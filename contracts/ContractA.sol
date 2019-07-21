@@ -127,7 +127,7 @@ contract CountAndDeposit {
     // (also die Einzahlungen der Maschine) zurück
     function getBalance() public view returns (uint) {
             require (msg.sender == contractOwner || msg.sender == contractPartner);
-            return machineBalance[contractOwner];
+            return (address(this).balance / 10**18);
     }
     
     // überprüft und gibt den Counter des owners
@@ -154,7 +154,7 @@ contract CountAndDeposit {
     // gibt Ja/Nein Wert aus
     function checkConfirmationAndSendPayment() public {
          require (msg.sender == contractOwner || msg.sender == contractPartner);
-         if (ConfirmationOwner == 1 && ConfirmationPartner == 1) {
+         if (ConfirmationOwner == 1 && ConfirmationPartner == 1 && ((address(this).balance / 10**18) >= balanceLimit) && (balanceLimit != 0)) {
          contractPartner.transfer(address(this).balance);
          CountAndDeposit.getCertificate;
         }
