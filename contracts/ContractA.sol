@@ -175,10 +175,17 @@ contract CountAndDeposit {
     
 // AB HIER BEGINNT DER CODE FÜR DAS ZERTIFIKAT 
     // Erst werden die Adressen auf Typ uint gemappt
-    // Dann werden alle Zertifikatsbezogenen Werte in einer Funktion ausgegeben
+    // Dann werden alle zertifikatsbezogenen Werte in einer Funktion ausgegeben
     function getCertificate() public view 
         returns (address, address, address, uint256, uint256, uint, uint, uint) {
             
-        return (contractOwner, contractPartner, contractAddress, ConfirmationOwner, ConfirmationPartner, counterLimit, stampOwner, stampPartner);
+        return (contractOwner, contractPartner, address(this), ConfirmationOwner, ConfirmationPartner, counterLimit, stampOwner, stampPartner);
     }
+
+    event certificate(address contractOwner, address contractPartner, uint ConfirmationOwner, uint ConfirmationPartner, uint counterLimit, uint stampOwner, uint stampPartner);
+    
+    function test() public {
+        emit certificate(contractOwner, contractPartner, ConfirmationOwner, ConfirmationPartner, counterLimit, stampOwner, stampPartner);
+    }
+
 }
