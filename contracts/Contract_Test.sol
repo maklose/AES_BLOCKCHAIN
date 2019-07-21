@@ -181,8 +181,7 @@ contract CountAndDeposit {
         return (contractOwner, contractPartner, address(this), ConfirmationOwner, ConfirmationPartner, counterLimit, stampOwner, stampPartner);
     }
 
-
-
+    // Ein Event wird erstellt mit den relevanten Informationen
     event Zertifikat(
             address _contractOwner,
             address _contractPartner,
@@ -192,7 +191,8 @@ contract CountAndDeposit {
             uint _stampOwner,
             uint _stampPartner
         );
-        
+    // Die Funktion schmeißt das Zertifikat aus
+    // Hier wird der Input des Zertifikats nochmal definiert
     function zertifikat() public {
         emit Zertifikat(
             contractOwner, 
