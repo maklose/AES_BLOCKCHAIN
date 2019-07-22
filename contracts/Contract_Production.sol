@@ -152,11 +152,11 @@ contract CountAndDeposit {
     // überprüft, ob von beiden Parteien (Maschine und Dienstleister) die Bestätigungen eingegangen
     // sind
     // gibt Ja/Nein Wert aus
-    function checkConfirmationAndSendPayment() public returns (address, address, address, uint256, uint256, uint, uint, uint) {
+    function checkConfirmationAndSendPayment() public returns (address, address, address, uint256, uint256, uint, uint, uint, uint) {
          require (msg.sender == contractOwner || msg.sender == contractPartner);
          if (ConfirmationOwner == 1 && ConfirmationPartner == 1 && ((address(this).balance / 10**18) >= balanceLimit) && (balanceLimit != 0)) {
          contractPartner.transfer(address(this).balance);
-         return (contractOwner, contractPartner, address(this), ConfirmationOwner, ConfirmationPartner, counterLimit, stampOwner, stampPartner);
+         return (contractOwner, contractPartner, address(this), ConfirmationOwner, ConfirmationPartner, counterLimit, balanceLimit, stampOwner, stampPartner);
         }
     }
     
@@ -177,15 +177,15 @@ contract CountAndDeposit {
     // Erst werden die Adressen auf Typ uint gemappt
     // Dann werden alle zertifikatsbezogenen Werte in einer Funktion ausgegeben
     function getCertificate() public view 
-        returns (address, address, address, uint256, uint256, uint, uint, uint) {
+        returns (address, address, address, uint256, uint256, uint, uint, uint, uint) {
             
-        return (contractOwner, contractPartner, address(this), ConfirmationOwner, ConfirmationPartner, counterLimit, stampOwner, stampPartner);
+        return (contractOwner, contractPartner, address(this), ConfirmationOwner, ConfirmationPartner, counterLimit, balanceLimit, stampOwner, stampPartner);
     }
 
-    event certificate(address contractOwner, address contractPartner, uint ConfirmationOwner, uint ConfirmationPartner, uint counterLimit, uint stampOwner, uint stampPartner);
+    event certificate(address contractOwner, address contractPartner, uint ConfirmationOwner, uint ConfirmationPartner, uint counterLimit, uint balanceLimit, uint stampOwner, uint stampPartner);
     
     function test() public {
-        emit certificate(contractOwner, contractPartner, ConfirmationOwner, ConfirmationPartner, counterLimit, stampOwner, stampPartner);
+        emit certificate(contractOwner, contractPartner, ConfirmationOwner, ConfirmationPartner, counterLimit, balanceLimit, stampOwner, stampPartner);
     }
 
 }
