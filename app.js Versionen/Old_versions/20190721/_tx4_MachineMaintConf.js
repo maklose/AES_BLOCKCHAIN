@@ -76,7 +76,7 @@ function sendSignedTxToBlockchain(GasPrice, GasLimit, PrivateKey, FromAddress, T
 
 //Path has to be adapted to every PC
 var configInput = require('C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_202/To_appjs/appjs_config.json');
-var filePathCPMaintConfJson = configInput.variables.filePathM203_To_appjs + 'confirmMaintenance.json';
+var filePathMachineMaintConfJson = configInput.variables.filePathM202_To_appjs + 'confirmMaintenance.json';
 
 //Declaration of single variables for Raw Transaction Data
 var GasPrice = configInput.variables.SC_GasPrice;
@@ -89,7 +89,7 @@ var iFromAddress;
 var value;
 var iPrivateKey;
 var iData;
-var iPartnerConfirm;
+var iMachineConfirm;
 var errorInputJson = new Boolean(false);
 var jsonInputData;
 var privateKey;
@@ -98,11 +98,10 @@ var serializedTx;
 var rawTx;
 
 
-
 //-------------------------------------------------------------------------------------------------------------------//
-// Maintenance Confirmation of Contract Partner (CP) / Service Provider
+// Maintenance Confirmation of Machine / Manufacturer
 
-jsonInputData = require(filePathCPMaintConfJson);
+jsonInputData = require(filePathMachineMaintConfJson);
 
 
 try {
@@ -110,7 +109,7 @@ try {
     iToAddress      = jsonInputData.confirmation1.SC_Address;
     iFromAddress    = jsonInputData.confirmation1.Wallet1;
     iPrivateKey     = jsonInputData.confirmation1.PrivateKeyW1;
-    iPartnerConfirm = jsonInputData.confirmation1.Data.FunctionSelector;
+    iMachineConfirm = jsonInputData.confirmation1.Data.FunctionSelector;
 
     console.log("iToAddress: " + iToAddress);
     console.log("iFromAddress: " + iFromAddress);
@@ -132,22 +131,22 @@ if (errorInputJson == true) {
     //proceed sending initializing Transactions to SC
 
     //check if confirmation has been send via JSON
-    if (iPartnerConfirm == 'machineConfirm')
+    if (iMachineConfirm == 'machineConfirm')
     {
             
     //Define ContractPartner
-    iData = web3.eth.abi.encodeFunctionCall({name: 'setConfirmationPartner', type: 'function', inputs: [{type: 'uint256', name: 'input'}]},
+    iData = web3.eth.abi.encodeFunctionCall({name: 'setConfirmationOwner', type: 'function', inputs: [{type: 'uint256', name: 'input'}]},
     ['1']);
     
     sendSignedTxToBlockchain(GasPrice, GasLimit, iPrivateKey, iFromAddress, iToAddress,
         iValue_0, iData);
     
-        console.log("ContractPartner/Service Provider has confirmed Maintenance "
+        console.log("Machine has confirmed Maintenance "
             + "via JSON file. Confirmation Transaction send to Smart Contract!");
 
     //delete input JSON file
-    deleteJSONfile(filePathCPMaintConfJson);
-    console.log("SC deployment & initialization finished. JSON input deleted!");
+    deleteJSONfile(filePathMachineMaintConfJson);
+    
     }else{
         console.log("JSON Maintenance Confirmation found, but Maintenance " + 
          "has not been confirmed within this file. No Transaction send to Smart Contract");

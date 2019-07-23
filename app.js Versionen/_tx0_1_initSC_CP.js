@@ -134,12 +134,14 @@ if (errorInputJson == true) {
     //Input JSON with errors, no Transaction can be send to Blockchain
 } else {
     //proceed sending initializing Transactions to SC
+    iData = '';
 
     //Define ContractPartner
     iData = web3.eth.abi.encodeFunctionCall({
         name: 'setContractPartner', type: 'function',
         inputs: [{ type: 'address', name: 'input' }]
     }, [iContractPartner]);
+
     sendSignedTxToBlockchain(GasPrice, GasLimit, iPrivateKey, iFromAddress, iToAddress,
         iValue_0, iData);
 }

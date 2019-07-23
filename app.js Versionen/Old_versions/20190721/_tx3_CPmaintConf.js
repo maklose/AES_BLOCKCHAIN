@@ -136,7 +136,7 @@ if (errorInputJson == true) {
     {
             
     //Define ContractPartner
-    iData = web3.eth.abi.encodeFunctionCall({name: 'setConfirmationPartner', type: 'function', inputs: [{type: 'uint256', name: 'input'}]},
+    iData = web3.eth.abi.encodeFunctionCall({name: 'setConfirmationOwner', type: 'function', inputs: [{type: 'uint256', name: 'input'}]},
     ['1']);
     
     sendSignedTxToBlockchain(GasPrice, GasLimit, iPrivateKey, iFromAddress, iToAddress,
