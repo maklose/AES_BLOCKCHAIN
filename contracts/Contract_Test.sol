@@ -61,7 +61,7 @@ contract CountAndDeposit {
     // Maschine schickt Bestätigung an Smart Contract (0 oder 1)
     // kann nur von der Maschine ausgeführt werden und es darf noch keine Bestätigung im SC sein
     function setConfirmationOwner(uint input) public {
-        require (msg.sender == contractOwner && ConfirmationOwner < 1);
+        require (msg.sender == contractOwner && ConfirmationOwner < 1 && ((address(this).balance / 10**18) >= balanceLimit) && (balanceLimit != 0));
         ConfirmationOwner = input;
         stampOwner = now;
     }
@@ -69,7 +69,7 @@ contract CountAndDeposit {
     // Dienstleister schickt Bestätigung an Smart Contract (0 oder 1)
     // kann nur vom Dienstleister ausgeführt werden und es darf noch keine Bestätigung im SC sein
     function setConfirmationPartner(uint input) public {
-        require (msg.sender == contractPartner && ConfirmationPartner < 1);
+        require (msg.sender == contractPartner && ConfirmationPartner < 1 && ((address(this).balance / 10**18) >= balanceLimit) && (balanceLimit != 0));
         ConfirmationPartner = input;
         stampPartner = now;
     }
@@ -152,11 +152,18 @@ contract CountAndDeposit {
     // überprüft, ob von beiden Parteien (Maschine und Dienstleister) die Bestätigungen eingegangen
     // sind
     // gibt Ja/Nein Wert aus
-    function checkConfirmationAndSendPayment() public returns (address, address, address, uint256, uint256, uint, uint, uint) {
+    function checkConfirmationAndSendPayment() public 
+        returns (address addressOwner, address addressPartner, address addressContract, uint256 OwnerConfirmation, uint TimestampOwnerConfirmation, 
+        uint256 PartnerConfirmation, uint TimestampPartnerConfirmation, uint LimitCounter, uint LimitBalance) {
+         
          require (msg.sender == contractOwner || msg.sender == contractPartner);
+         
          if (ConfirmationOwner == 1 && ConfirmationPartner == 1 && ((address(this).balance / 10**18) >= balanceLimit) && (balanceLimit != 0)) {
          contractPartner.transfer(address(this).balance);
-         return (contractOwner, contractPartner, address(this), ConfirmationOwner, ConfirmationPartner, counterLimit, stampOwner, stampPartner);
+         
+         emit certificate(contractOwner, contractPartner, ConfirmationOwner, stampOwner, ConfirmationPartner, stampPartner, counterLimit, balanceLimit);
+         
+         return (contractOwner, contractPartner, address(this), ConfirmationOwner, stampOwner, ConfirmationPartner, stampPartner, counterLimit, balanceLimit);
         }
     }
     
@@ -177,37 +184,18 @@ contract CountAndDeposit {
     // Erst werden die Adressen auf Typ uint gemappt
     // Dann werden alle zertifikatsbezogenen Werte in einer Funktion ausgegeben
     function getCertificate() public view 
-        returns (address, address, address, uint256, uint256, uint, uint, uint) {
-        return (contractOwner, contractPartner, address(this), ConfirmationOwner, ConfirmationPartner, counterLimit, stampOwner, stampPartner);
+        returns (address, address, address, uint256, uint256, uint, uint, uint, uint) {
+            
+        return (contractOwner, contractPartner, address(this), ConfirmationOwner, ConfirmationPartner, counterLimit, balanceLimit, stampOwner, stampPartner);
     }
 
-    // Ein Event wird erstellt mit den relevanten Informationen
-    event Zertifikat(
-            address _contractOwner,
-            address _contractPartner,
-            uint _ConfirmationOwner,
-            uint _ConfirmationPartner,
-            uint _counterLimit,
-            uint _stampOwner,
-            uint _stampPartner
-        );
-    // Die Funktion schmeißt das Zertifikat aus
-    // Hier wird der Input des Zertifikats nochmal definiert
-    function zertifikat() public {
-        emit Zertifikat(
-            contractOwner, 
-            contractPartner,
-            ConfirmationOwner,
-            ConfirmationPartner,
-            counterLimit,
-            stampOwner,
-            stampPartner
-            );
+    event certificate(address contractOwner, address contractPartner, uint ConfirmationOwner, uint stampOwner, uint ConfirmationPartner, uint stampPartner, uint counterLimit, uint balanceLimit);
+    
+    function test() public {
+        emit certificate(contractOwner, contractPartner, ConfirmationOwner, stampOwner, ConfirmationPartner, stampPartner, counterLimit, balanceLimit);
     }
 
 }
-
-
 
 
 contract PayPerUse {
@@ -217,6 +205,7 @@ contract PayPerUse {
     address payable contractAddress;
     mapping(address => uint256) machineBalance;
     mapping(address => uint256) machineCounter;
+    uint machinePaymentRate;
     
     
     // HIER DEFINIEREN WIR DEN CONTRACT
@@ -234,23 +223,30 @@ contract PayPerUse {
          machineUser = input;
      }
      
-    // HIER SIND FUNKTIONEN, UM DEN CONTRACT ZU NUTZEN
-    // INPUT
-    // erhöht Counter für Maschinenstunden des owners
+     // setzt den Stundesatz der für eine Maschinenstunde gezahlt wird fest
+     function setMachinePaymentRate(uint input) public {
+         require (msg.sender == machineOwner);
+         machinePaymentRate = input; 
+     }
+     
+    
+    // erhöht Counter für Maschinenstunden und balance des owners
     // (also der Maschine, die den Contract angelegt hat)
+    // führt im Anschluss Zahlung an den Hersteller aus, in Höhe des errechneten Betrages aus machineCounter*machinePaymentRate
     function increase(uint256 input) public payable {
         require (msg.sender == machineUser);
         machineCounter[machineUser] += input;
         machineBalance[machineUser] +=msg.value; //notwendig??
+        machineOwner.transfer(address(this).balance*machinePaymentRate);
     }
     
     
     CountAndDeposit cd;
     
+    // gibt das aktuelle Stundeskonto der Maschine wieder (greift auf den anderen SC zurück)
     function getMachineHours(address _contractAddress) public returns (uint) {
         cd = CountAndDeposit(_contractAddress);
         return cd.getCount();
     }
-    
     
 }
