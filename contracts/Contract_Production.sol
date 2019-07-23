@@ -61,7 +61,7 @@ contract CountAndDeposit {
     // Maschine schickt Bestätigung an Smart Contract (0 oder 1)
     // kann nur von der Maschine ausgeführt werden und es darf noch keine Bestätigung im SC sein
     function setConfirmationOwner(uint input) public {
-        require (msg.sender == contractOwner && ConfirmationOwner < 1);
+        require (msg.sender == contractOwner && ConfirmationOwner < 1 && ((address(this).balance / 10**18) >= balanceLimit) && (balanceLimit != 0));
         ConfirmationOwner = input;
         stampOwner = now;
     }
@@ -69,7 +69,7 @@ contract CountAndDeposit {
     // Dienstleister schickt Bestätigung an Smart Contract (0 oder 1)
     // kann nur vom Dienstleister ausgeführt werden und es darf noch keine Bestätigung im SC sein
     function setConfirmationPartner(uint input) public {
-        require (msg.sender == contractPartner && ConfirmationPartner < 1);
+        require (msg.sender == contractOwner && ConfirmationOwner < 1 && ((address(this).balance / 10**18) >= balanceLimit) && (balanceLimit != 0));
         ConfirmationPartner = input;
         stampPartner = now;
     }
