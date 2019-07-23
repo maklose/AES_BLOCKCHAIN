@@ -69,7 +69,7 @@ contract CountAndDeposit {
     // Dienstleister schickt Bestätigung an Smart Contract (0 oder 1)
     // kann nur vom Dienstleister ausgeführt werden und es darf noch keine Bestätigung im SC sein
     function setConfirmationPartner(uint input) public {
-        require (msg.sender == contractOwner && ConfirmationOwner < 1 && ((address(this).balance / 10**18) >= balanceLimit) && (balanceLimit != 0));
+        require (msg.sender == contractPartner && ConfirmationPartner < 1 && ((address(this).balance / 10**18) >= balanceLimit) && (balanceLimit != 0));
         ConfirmationPartner = input;
         stampPartner = now;
     }
@@ -152,11 +152,18 @@ contract CountAndDeposit {
     // überprüft, ob von beiden Parteien (Maschine und Dienstleister) die Bestätigungen eingegangen
     // sind
     // gibt Ja/Nein Wert aus
-    function checkConfirmationAndSendPayment() public returns (address, address, address, uint256, uint256, uint, uint, uint, uint) {
+    function checkConfirmationAndSendPayment() public 
+        returns (address addressOwner, address addressPartner, address addressContract, uint256 OwnerConfirmation, uint TimestampOwnerConfirmation, 
+        uint256 PartnerConfirmation, uint TimestampPartnerConfirmation, uint LimitCounter, uint LimitBalance) {
+         
          require (msg.sender == contractOwner || msg.sender == contractPartner);
+         
          if (ConfirmationOwner == 1 && ConfirmationPartner == 1 && ((address(this).balance / 10**18) >= balanceLimit) && (balanceLimit != 0)) {
          contractPartner.transfer(address(this).balance);
-         return (contractOwner, contractPartner, address(this), ConfirmationOwner, ConfirmationPartner, counterLimit, balanceLimit, stampOwner, stampPartner);
+         
+         emit certificate(contractOwner, contractPartner, ConfirmationOwner, stampOwner, ConfirmationPartner, stampPartner, counterLimit, balanceLimit);
+         
+         return (contractOwner, contractPartner, address(this), ConfirmationOwner, stampOwner, ConfirmationPartner, stampPartner, counterLimit, balanceLimit);
         }
     }
     
@@ -182,10 +189,10 @@ contract CountAndDeposit {
         return (contractOwner, contractPartner, address(this), ConfirmationOwner, ConfirmationPartner, counterLimit, balanceLimit, stampOwner, stampPartner);
     }
 
-    event certificate(address contractOwner, address contractPartner, uint ConfirmationOwner, uint ConfirmationPartner, uint counterLimit, uint balanceLimit, uint stampOwner, uint stampPartner);
+    event certificate(address contractOwner, address contractPartner, uint ConfirmationOwner, uint stampOwner, uint ConfirmationPartner, uint stampPartner, uint counterLimit, uint balanceLimit);
     
     function test() public {
-        emit certificate(contractOwner, contractPartner, ConfirmationOwner, ConfirmationPartner, counterLimit, balanceLimit, stampOwner, stampPartner);
+        emit certificate(contractOwner, contractPartner, ConfirmationOwner, stampOwner, ConfirmationPartner, stampPartner, counterLimit, balanceLimit);
     }
 
 }
