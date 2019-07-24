@@ -76,22 +76,25 @@ function sendSignedTxToBlockchain(GasPrice, GasLimit, PrivateKey, FromAddress, T
 
 //Path has to be adapted to every PC
 var configInput = require('C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_202/To_appjs/appjs_config.json');
-var filePathCPMaintConfJson = configInput.variables.filePathM203_To_appjs + 'confirmMaintenance.json';
+var filePathNewSCaddr = configInput.variables.filePathM202_To_SAP + 'newSC_Address_appjs.json';
+var filePathCreateSC = configInput.variables.filePathM202_To_appjs + 'CreateMaintContract.json';
+var iValue_0 = configInput.variables.iValue_0;
+console.log('ivalue0:' + iValue_0)
 
 //Declaration of single variables for Raw Transaction Data
 var GasPrice = configInput.variables.SC_GasPrice;
 var GasLimit = configInput.variables.SC_GasLimit;
-var iValue_0 = configInput.variables.iValue_0;
 
 
 var iToAddress;
 var iFromAddress;
+var iCounterLimitHours;
 var value;
 var iPrivateKey;
 var iData;
-var iPartnerConfirm;
 var errorInputJson = new Boolean(false);
 var jsonInputData;
+var jsonSCAddress;
 var privateKey;
 var tx;
 var serializedTx;
@@ -100,21 +103,22 @@ var rawTx;
 
 
 //-------------------------------------------------------------------------------------------------------------------//
-// Maintenance Confirmation of Contract Partner (CP) / Service Provider
+//initialize new Smart Contracts --> set CounterLimit (for Working Hours)
 
-jsonInputData = require(filePathCPMaintConfJson);
-
+jsonInputData = require(filePathCreateSC);
+jsonSCAddress = require(filePathNewSCaddr);
 
 try {
     //txInputData
-    iToAddress      = jsonInputData.confirmation1.SC_Address;
-    iFromAddress    = jsonInputData.confirmation1.Wallet1;
-    iPrivateKey     = jsonInputData.confirmation1.PrivateKeyW1;
-    iPartnerConfirm = jsonInputData.confirmation1.Data.FunctionSelector;
+    iToAddress = jsonSCAddress.SC_Address;
+    iFromAddress = jsonInputData.NewContract.Machine_Wallet;
+    iPrivateKey = jsonInputData.NewContract.PrivateKey_Machine_W;
+    iCounterLimitHours = jsonInputData.NewContract.CounterLimitHours;
 
     console.log("iToAddress: " + iToAddress);
     console.log("iFromAddress: " + iFromAddress);
     console.log("iPrivateKey: " + iPrivateKey);
+    console.log("iCounterLimitHours: " + iCounterLimitHours);
 
 }
 catch (e) {
@@ -131,25 +135,17 @@ if (errorInputJson == true) {
 } else {
     //proceed sending initializing Transactions to SC
 
-    //check if confirmation has been send via JSON
-    if (iPartnerConfirm == 'machineConfirm')
-    {
-            
     //Define ContractPartner
-    iData = web3.eth.abi.encodeFunctionCall({name: 'setConfirmationPartner', type: 'function', inputs: [{type: 'uint256', name: 'input'}]},
-    ['1']);
-    
+    iData = web3.eth.abi.encodeFunctionCall({
+        name: 'setCounterLimit', type: 'function',
+        inputs: [{ type: 'uint256', name: 'input' }]
+      }, [iCounterLimitHours]);
     sendSignedTxToBlockchain(GasPrice, GasLimit, iPrivateKey, iFromAddress, iToAddress,
         iValue_0, iData);
-    
-        console.log("ContractPartner/Service Provider has confirmed Maintenance "
-            + "via JSON file. Confirmation Transaction send to Smart Contract!");
-
-    //delete input JSON file
-    deleteJSONfile(filePathCPMaintConfJson);
-    console.log("SC deployment & initialization finished. JSON input deleted!");
-    }else{
-        console.log("JSON Maintenance Confirmation found, but Maintenance " + 
-         "has not been confirmed within this file. No Transaction send to Smart Contract");
-    }
 }
+
+/** 
+ * No deletion of Input JSON file, because futher Transactions in other scripts required
+ * to initialize the SC correctly. Last Script will delete the input JSON file
+
+*/

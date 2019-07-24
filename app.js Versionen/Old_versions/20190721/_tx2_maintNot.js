@@ -119,7 +119,6 @@ try {
    iPrivateKey = jsonInputData.SmartContract1.PrivateKey_Machine_W;
 
    console.log("iToAddress: " + iToAddress);
-   console.log("iFromAddress: " + iFromAddress);
 
 }
 catch (e) {
@@ -137,7 +136,7 @@ if (errorInputJson == true) {
    //proceed sending initializing Transactions to SC
 
    //Define ContractPartner
-   web3.eth.call({ from: iFromAddress, to: iToAddress, data: web3Abi.encodeFunctionSignature('checkBalanceLimit()') },
+   web3.eth.call({ from: iFromAddress, to: iToAddress, data: web3Abi.encodeFunctionSignature('checkCounterLimit()') },
       (err, result) => {
          console.log("result Maint: " + result);
 
@@ -145,44 +144,50 @@ if (errorInputJson == true) {
             console.log("No Maintenance neccessary!");
          } else {
 
-            //get Counter Limit for Logging
-            web3.eth.call({
-               from: iFromAddress,
-               to: iToAddress,
-               data: web3Abi.encodeFunctionSignature('getCounterLimit()')
-            },
-               (err, counterLimit) => {
-                  decimalCounterLimit = web3.utils.toDecimal(counterLimit);
-                  console.log("CounterLimit von mir set: " + decimalCounterLimit);
+            //Get Contract Owner / Machine Wallet
+            web3.eth.call({ from: iFromAddress, to: iToAddress, data: web3Abi.encodeFunctionSignature('getContractOwner()') },
+               (err, contractOwnerWallet) => {
+                  console.log("contractOwnerWallet: " + contractOwnerWallet);
 
-
-                  //Get current count of Working Hours
+                  //get Counter Limit for Logging
                   web3.eth.call({
                      from: iFromAddress,
                      to: iToAddress,
-                     data: web3Abi.encodeFunctionSignature('getCount()')
+                     data: web3Abi.encodeFunctionSignature('getCounterLimit()')
                   },
-                     (err, machineCounter) => {
-                        countedWorkingHours = web3.utils.toDecimal(machineCounter);
-                        console.log(countedWorkingHours);
+                     (err, counterLimit) => {
+                        decimalCounterLimit = web3.utils.toDecimal(counterLimit);
+                        console.log("CounterLimit von mir set: " + decimalCounterLimit);
+
+
+                        //Get current count of Working Hours
+                        web3.eth.call({
+                           from: iFromAddress,
+                           to: iToAddress,
+                           data: web3Abi.encodeFunctionSignature('getCount()')
+                        },
+                           (err, machineCounter) => {
+                              countedWorkingHours = web3.utils.toDecimal(machineCounter);
+                              console.log(countedWorkingHours);
 
 
 
-                        // create Output JSON File to contact Service Provider to 
-                        // do the Machine Maintenance for Machine in contractOwnerWallet
+                              // create Output JSON File to contact Service Provider to 
+                              // do the Machine Maintenance for Machine in contractOwnerWallet
 
-                        var obj = { Maintenance1: [] };
-                        obj.Maintenance1.push({
-                           "Machine_Wallet": iFromAddress,
-                           "SC_Address": iToAddress,
-                           "Maintenance": "Yes",
-                           "WorkingHours_all": countedWorkingHours
-                        });
+                              var obj = { Maintenance1: [] };
+                              obj.Maintenance1.push({
+                                 "Machine_Wallet": contractOwnerWallet,
+                                 "SC_Address": iToAddress,
+                                 "Maintenance": "Yes",
+                                 "WorkingHours_all": countedWorkingHours
+                              });
 
-                        var json = JSON.stringify(obj, null, 2);
-                        fs.writeFile(filePathMaintenanceTransactionJson,
-                           json, 'utf8', function (err) { if (err) throw err; console.log('complete'); });
-                        console.log("Maintenance needed, Service Provider already informed!");
+                              var json = JSON.stringify(obj, null, 2);
+                              fs.writeFile(filePathMaintenanceTransactionJson,
+                                 json, 'utf8', function (err) { if (err) throw err; console.log('complete'); });
+                              console.log("Maintenance needed, Service Provider already informed!");
+                           });
                      });
                });
          }
@@ -196,8 +201,6 @@ if (errorInputJson == true) {
    iData = web3Abi.encodeFunctionSignature('checkConfirmationAndSendPayment()');
    sendSignedTxToBlockchain(GasPrice, GasLimit, iPrivateKey, iFromAddress, iToAddress,
       iValue_0, iData);
-
-
 
    //delete input JSON file with input SC addresses
    deleteJSONfile(filePathSCaddressesToCheck);
