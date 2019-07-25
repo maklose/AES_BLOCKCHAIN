@@ -20,8 +20,8 @@ function wait(ms) {
 
 //Path has to be adapted to every PC
 var configInput = require('C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_202/To_appjs/appjs_config.json');
-var filePathCreateSC = configInput.variables.filePathM202_To_appjs + 'new_sc.json';
-var filePathNewSC     = configInput.variables.filePathM202_To_SAP + 'new_sc_address.json';
+var filePathCreateSC = configInput.variables.filePathM202_To_appjs + 'CreateMaintContract.json';
+var filePathNewSC     = configInput.variables.filePathM202_To_SAP + 'newSC_Address_appjs.json';
 var GasPrice = configInput.variables.SC_GasPrice;
 var GasLimit = configInput.variables.SC_GasLimit;
 var FromAddress;
