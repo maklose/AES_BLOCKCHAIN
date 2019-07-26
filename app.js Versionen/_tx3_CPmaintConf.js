@@ -20,7 +20,7 @@ var handleReceipt = (error, receipt) => {
 //2. Function: Delete JSON File from Directory
 
 function deleteJSONfile(filePath) {
-    //fs.unlink(filePath, function (err) {});
+    fs.unlink(filePath, function (err) {});
     console.log('JSON File deleted');
 }
 
@@ -76,7 +76,7 @@ function sendSignedTxToBlockchain(GasPrice, GasLimit, PrivateKey, FromAddress, T
 
 //Path has to be adapted to every PC
 var configInput = require('C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_202/To_appjs/appjs_config.json');
-var filePathCPMaintConfJson = configInput.variables.filePathM203_To_appjs + 'confirmMaintenance.json';
+var filePathCPMaintConfJson = configInput.variables.filePathM203_To_appjs + 'confirm_h.json';
 
 //Declaration of single variables for Raw Transaction Data
 var GasPrice = configInput.variables.SC_GasPrice;

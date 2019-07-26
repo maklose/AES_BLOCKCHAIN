@@ -17,27 +17,70 @@ var handleReceipt = (error, receipt) => {
    }
 }
 
+
 //2. Function: Delete JSON File from Directory
 
 function deleteJSONfile(filePath) {
-   fs.unlink(filePath, function (err) {});
+   //fs.unlink(filePath, function (err) {});
    console.log('JSON File deleted');
 }
-function wait(ms) {
-   var d = new Date();
-   var d2 = null;
-   do { d2 = new Date(); }
-   while (d2 - d < ms);
- }
+
+
+//3. Function: SendSignedTransaction
+
+function sendSignedTxToBlockchain(GasPrice, GasLimit, PrivateKey, FromAddress, ToAddress, EthValue, Data) {
+
+   //prepare values to Hex Code
+   value = web3.utils.toHex(web3.utils.toWei(EthValue.toString(), "ether"));
+
+   //1st Calculate Nonce:
+   web3.eth.getTransactionCount(FromAddress, 'pending', (err, txCount) => {
+      //Estimate Gas Price
+
+      web3.eth.estimateGas({ to: ToAddress, data: Data },
+         (err, gasEstimate) => {
+            //testing: Show Output in Console
+            console.log("Output Transaction values:");
+            console.log("");
+            console.log("GasEstimate: " + gasEstimate);
+            console.log("iGasPrice: " + GasPrice)
+            console.log("hexGasLimit: " + GasLimit);
+            console.log("Value: " + value);
+            console.log("Nonce value: " + txCount);
+            console.log("Data: " + Data);
+            console.log("");
+
+            //Create Transaction Object with raw data
+            rawTx = {
+               nonce: web3.utils.toHex(txCount),
+               gasPrice: web3.utils.toHex(GasPrice.toString()),
+               gasLimit: web3.utils.toHex(GasLimit.toString()),
+               to: ToAddress,
+               value: value,
+               data: Data
+            };
+
+            //digital signature
+            privateKey = new Buffer(PrivateKey, 'hex');
+            tx = new Tx(rawTx);
+            tx.sign(privateKey);
+
+            //send signed Transaction to Blockchain
+            serializedTx = tx.serialize();
+            web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), handleReceipt);
+         })
+   });
+}
+
 
 //-------------------------------------------------------------------------------------------------------------------//
 
 //Path has to be adapted to every PC
 var configInput = require('C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_202/To_appjs/appjs_config.json');
 var filePathMaintenanceTransactionJson = configInput.variables.filePathM203_To_SAP
-   + 'new_maintenance_notification.json';
+   + 'MaintenanceNotification.json';
 var filePathSCaddressesToCheck = configInput.variables.filePathM202_To_appjs
-   + 'request_sc.json';
+   + 'Maint_request_V2.json';
 
 
 //Declaration of single variables for Raw Transaction Data
@@ -151,95 +194,12 @@ if (errorInputJson == true) {
 
 
    iData = web3Abi.encodeFunctionSignature('checkConfirmationAndSendPayment()');
-
-      //1st Calculate Nonce:
-web3.eth.getTransactionCount(iFromAddress, 'pending', (err, txCount) => {
-   //Estimate Gas Price
-   web3.eth.estimateGas({ to: iToAddress, data: iData },
-     (err, gasEstimate) => {
- 
-       //Create Transaction Object with raw data
-       var rawTx = {
-         nonce: web3.utils.toHex(txCount),
-         gasPrice: web3.utils.toHex(GasPrice.toString()),
-         gasLimit: web3.utils.toHex(GasLimit.toString()),
-         data: iData
-       };
- 
-       //digital signature
-       var privateKey = new Buffer(iPrivateKey, 'hex');
-       var tx = new Tx(rawTx);
-       tx.sign(privateKey);
- 
-       //send signed Transaction to Blockchain
-       var serializedTx = tx.serialize();
-       web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), (err, result) => {
-         if (err) {
-           console.log(err); return;
-         }
- 
-         // Log the tx, you can explore status manually with eth.getTransaction()
-         console.log('Certificate return: ' + result);
-         
-   
- //TODO: Wait besser ausprogrammieren mit einer 'While receipt == null Funktionalität'
- 
- 
-          
-         // Wait 120sec for the transaction to be mined    
-         wait(30000);
-         
-         //wait onto TX_Receipt via while function did not work --> document
-         web3.eth.getTransactionReceipt(result, (err, receipt) => {
-           console.log("receipt Ending: " + receipt);
-                     
-            });
-               
-           }); 
-          });  
-      
-     });
-   
-};
-
-//--------------------------------------------------------------------------------------//
-// Check Smart Contract for a new Certificate
-
-web3.eth.call({ from: iFromAddress, to: iToAddress, data: web3Abi.encodeFunctionSignature('createCertificate()') },
-(err, certificate) => {
-   console.log("New Certificate: " + certificate);
-
-   if(certificate == '0x')
-   {
-      //certificate not available
-   }else{
-      //certificate available
-
-
-      /**
-       * Create JSON File here with certificate data
-       * 
-       * 
-       *  var obj = { Maintenance1: [] };
-                        obj.Maintenance1.push({
-                           "Machine_Wallet": iFromAddress,
-                           "SC_Address": iToAddress,
-                           "Maintenance": "Yes",
-                           "WorkingHours_all": countedWorkingHours
-                        });
-
-                        var json = JSON.stringify(obj, null, 2);
-                        fs.writeFile(filePathMaintenanceTransactionJson,
-                           json, 'utf8', function (err) { if (err) throw err; console.log('complete'); });
-                        console.log("Maintenance needed, Service Provider already informed!");
-       */
-   }
-
-});
+   sendSignedTxToBlockchain(GasPrice, GasLimit, iPrivateKey, iFromAddress, iToAddress,
+      iValue_0, iData);
 
 
 
-//--------------------------------------------------------------------------------------//
    //delete input JSON file with input SC addresses
    deleteJSONfile(filePathSCaddressesToCheck);
    console.log("SC deployment & initialization finished. JSON input deleted!");
+}
