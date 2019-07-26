@@ -1,20 +1,19 @@
 pragma solidity >=0.4.25 <0.7.0;
 
-contract CountAndDeposit {
+contract MaintenanceService {
     
     address payable contractOwner;
     address payable contractPartner;
     address payable contractAddress;
     uint256 ConfirmationOwner;
     uint256 ConfirmationPartner;
-    mapping(address => uint256) machineCounter;
+    uint256 machineCounter;
     uint counterLimit;
     uint balanceLimit;
     uint confOwner;
     uint confPartner;
     uint stampOwner;
     uint stampPartner;
-    uint stampCertificate;
     uint serviceType;
     uint256 transferAmount;
     uint256 restAmount;
@@ -56,7 +55,7 @@ contract CountAndDeposit {
     // (also der Maschine, die den Contract angelegt hat)
     function increase(uint256 input) public payable {
         require (msg.sender == contractOwner);
-        machineCounter[contractOwner] += input;
+        machineCounter += input;
     }
     
     // Maschine schickt Bestätigung an Smart Contract (0 oder 1)
@@ -90,7 +89,6 @@ contract CountAndDeposit {
         require (msg.sender == contractOwner);
         return stampPartner;
     }
-
 
 // HIER KANN MAN DEN STATUS DES CONTRACT PRÜFEN
 // ALLE GET FUNKTIONEN
@@ -142,7 +140,7 @@ contract CountAndDeposit {
     // (also die Maschinenstunden der Maschine) zurück
     function getCount() public view returns (uint) {
         require (msg.sender == contractOwner || msg.sender == contractPartner);
-        return machineCounter[contractOwner];
+        return machineCounter;
     }
 
     // gibt Signal zurück, ob Maschinenbestätigung eingegangen ist, oder nicht
@@ -170,15 +168,12 @@ contract CountAndDeposit {
         transferAmount = ((0 + balanceLimit) * 10**18); // zu zahlender Betrag wird definiert
         contractPartner.transfer(transferAmount);       // Betrag wird überwiesen
      
-        stampCertificate = now; // speichert den timestamp des Zertifikats
-        
         emit certificate(contractOwner, 
                 contractPartner, 
                 ConfirmationOwner, 
                 stampOwner, 
                 ConfirmationPartner, 
-                stampPartner,
-                stampCertificate,
+                stampPartner, 
                 counterLimit, 
                 balanceLimit);
         this.refund();                                  // ruft die refund-Funktion auf
@@ -218,7 +213,6 @@ contract CountAndDeposit {
                 uint, 
                 uint, 
                 uint, 
-                uint,
                 uint) {
         return (contractOwner, 
                 contractPartner, 
@@ -228,8 +222,7 @@ contract CountAndDeposit {
                 counterLimit, 
                 balanceLimit, 
                 stampOwner, 
-                stampPartner,
-                stampCertificate);
+                stampPartner);
     }
 
     event certificate(address contractOwner, 
@@ -237,9 +230,9 @@ contract CountAndDeposit {
                         uint ConfirmationOwner, 
                         uint stampOwner, 
                         uint ConfirmationPartner, 
-                        uint stampPartner,
-                        uint stampCertificate,
+                        uint stampPartner, 
                         uint counterLimit, 
                         uint balanceLimit);
-                    
 }
+
+
