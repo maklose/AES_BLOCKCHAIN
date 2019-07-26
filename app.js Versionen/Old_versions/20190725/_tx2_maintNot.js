@@ -20,7 +20,7 @@ var handleReceipt = (error, receipt) => {
 //2. Function: Delete JSON File from Directory
 
 function deleteJSONfile(filePath) {
-   fs.unlink(filePath, function (err) { });
+   fs.unlink(filePath, function (err) {});
    console.log('JSON File deleted');
 }
 function wait(ms) {
@@ -28,7 +28,7 @@ function wait(ms) {
    var d2 = null;
    do { d2 = new Date(); }
    while (d2 - d < ms);
-}
+ }
 
 //-------------------------------------------------------------------------------------------------------------------//
 
@@ -63,12 +63,14 @@ var iData;
 //-------------------------------------------------------------------------------------------------------------------//
 //initialize new Smart Contracts --> set MaintenanceCosts as BalanceLimit
 
+jsonInputData = require(filePathSCaddressesToCheck);
+
+
+
 // read JSON with all SC addresses
 
 try {
    //txInputData
-   jsonInputData = require(filePathSCaddressesToCheck);
-
    iToAddress = jsonInputData.SmartContract1.SC_Address;
    iFromAddress = jsonInputData.SmartContract1.Machine_Wallet;
    iPrivateKey = jsonInputData.SmartContract1.PrivateKey_Machine_W;
@@ -108,7 +110,7 @@ if (errorInputJson == true) {
             },
                (err, counterLimit) => {
                   decimalCounterLimit = web3.utils.toDecimal(counterLimit);
-                  console.log("CounterLimit: " + decimalCounterLimit);
+                  console.log("CounterLimit von mir set: " + decimalCounterLimit);
 
 
                   //Get current count of Working Hours
@@ -150,89 +152,94 @@ if (errorInputJson == true) {
 
    iData = web3Abi.encodeFunctionSignature('checkConfirmationAndSendPayment()');
 
-   //1st Calculate Nonce:
-   web3.eth.getTransactionCount(iFromAddress, 'pending', (err, txCount) => {
-      //Estimate Gas Price
-      web3.eth.estimateGas({ to: iToAddress, data: iData },
-         (err, gasEstimate) => {
-
-            //Create Transaction Object with raw data
-            var rawTx = {
-               nonce: web3.utils.toHex(txCount),
-               gasPrice: web3.utils.toHex(GasPrice.toString()),
-               gasLimit: web3.utils.toHex(GasLimit.toString()),
-               data: iData
-            };
-
-            //digital signature
-            var privateKey = new Buffer(iPrivateKey, 'hex');
-            var tx = new Tx(rawTx);
-            tx.sign(privateKey);
-
-            //send signed Transaction to Blockchain
-            var serializedTx = tx.serialize();
-            web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), (err, result) => {
-               if (err) {
-                  console.log(err); return;
-               }
-
-               // Log the tx, you can explore status manually with eth.getTransaction()
-               console.log('Result checkConfirmation/send Payment return: ' + result);
-
-
-               //TODO: Wait besser ausprogrammieren mit einer 'While receipt == null Funktionalität'
-
-               wait(10000);
-
+      //1st Calculate Nonce:
+web3.eth.getTransactionCount(iFromAddress, 'pending', (err, txCount) => {
+   //Estimate Gas Price
+   web3.eth.estimateGas({ to: iToAddress, data: iData },
+     (err, gasEstimate) => {
+ 
+       //Create Transaction Object with raw data
+       var rawTx = {
+         nonce: web3.utils.toHex(txCount),
+         gasPrice: web3.utils.toHex(GasPrice.toString()),
+         gasLimit: web3.utils.toHex(GasLimit.toString()),
+         data: iData
+       };
+ 
+       //digital signature
+       var privateKey = new Buffer(iPrivateKey, 'hex');
+       var tx = new Tx(rawTx);
+       tx.sign(privateKey);
+ 
+       //send signed Transaction to Blockchain
+       var serializedTx = tx.serialize();
+       web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), (err, result) => {
+         if (err) {
+           console.log(err); return;
+         }
+ 
+         // Log the tx, you can explore status manually with eth.getTransaction()
+         console.log('Certificate return: ' + result);
+         
+   
+ //TODO: Wait besser ausprogrammieren mit einer 'While receipt == null Funktionalität'
+ 
+ 
+          
+         // Wait 120sec for the transaction to be mined    
+         wait(30000);
+         
+         //wait onto TX_Receipt via while function did not work --> document
+         web3.eth.getTransactionReceipt(result, (err, receipt) => {
+           console.log("receipt Ending: " + receipt);
+                     
             });
-         });
-
-   });
-
+               
+           }); 
+          });  
+      
+     });
+   
 };
 
 //--------------------------------------------------------------------------------------//
 // Check Smart Contract for a new Certificate
 
-web3.eth.call({ from: iFromAddress, to: iToAddress, data: web3Abi.encodeFunctionSignature('getCertificate()') },
-   (err, certificate) => {
-      console.log("New Certificate: " + certificate);
+web3.eth.call({ from: iFromAddress, to: iToAddress, data: web3Abi.encodeFunctionSignature('createCertificate()') },
+(err, certificate) => {
+   console.log("New Certificate: " + certificate);
 
-      if (certificate == '0x') {
-         //certificate not available
-      } else {
-         //certificate available
+   if(certificate == '0x')
+   {
+      //certificate not available
+   }else{
+      //certificate available
 
-         //einzelne Abfragen der ganzen Infos, um JSON zu erstellen??
 
-         var hallo = web3.utils.hexToAscii(certificate);
+      /**
+       * Create JSON File here with certificate data
+       * 
+       * 
+       *  var obj = { Maintenance1: [] };
+                        obj.Maintenance1.push({
+                           "Machine_Wallet": iFromAddress,
+                           "SC_Address": iToAddress,
+                           "Maintenance": "Yes",
+                           "WorkingHours_all": countedWorkingHours
+                        });
 
-         console.log("hallo hallo: " + hallo);
+                        var json = JSON.stringify(obj, null, 2);
+                        fs.writeFile(filePathMaintenanceTransactionJson,
+                           json, 'utf8', function (err) { if (err) throw err; console.log('complete'); });
+                        console.log("Maintenance needed, Service Provider already informed!");
+       */
+   }
 
-         /**
-          * Create JSON File here with certificate data
-          * 
-          * 
-          *  var obj = { Maintenance1: [] };
-                           obj.Maintenance1.push({
-                              "Machine_Wallet": iFromAddress,
-                              "SC_Address": iToAddress,
-                              "Maintenance": "Yes",
-                              "WorkingHours_all": countedWorkingHours
-                           });
-   
-                           var json = JSON.stringify(obj, null, 2);
-                           fs.writeFile(filePathMaintenanceTransactionJson,
-                              json, 'utf8', function (err) { if (err) throw err; console.log('complete'); });
-                           console.log("Maintenance needed, Service Provider already informed!");
-          */
-      }
-
-   });
+});
 
 
 
 //--------------------------------------------------------------------------------------//
-//delete input JSON file with input SC addresses
-deleteJSONfile(filePathSCaddressesToCheck);
-console.log("SC deployment & initialization finished. JSON input deleted!");
+   //delete input JSON file with input SC addresses
+   deleteJSONfile(filePathSCaddressesToCheck);
+   console.log("SC deployment & initialization finished. JSON input deleted!");

@@ -20,7 +20,7 @@ var handleReceipt = (error, receipt) => {
 //2. Function: Delete JSON File from Directory
 
 function deleteJSONfile(filePath) {
-    fs.unlink(filePath, function (err) {});
+    fs.unlink(filePath, function (err) { });
     console.log('JSON File deleted');
 }
 
@@ -104,11 +104,13 @@ var rawTx;
 //-------------------------------------------------------------------------------------------------------------------//
 //initialize new Smart Contracts --> set ContractPartner
 
-jsonInputData = require(filePathCreateSC);
-jsonSCAddress = require(filePathNewSCaddr);
+
 
 try {
     //txInputData
+    jsonInputData = require(filePathCreateSC);
+    jsonSCAddress = require(filePathNewSCaddr);
+
     iToAddress = jsonSCAddress.SC_Address;
     iFromAddress = jsonInputData.NewContract.Machine_Wallet;
     iPrivateKey = jsonInputData.NewContract.PrivateKey_Machine_W;
@@ -146,7 +148,7 @@ if (errorInputJson == true) {
         iValue_0, iData);
 }
 
-/** 
+/**
  * No deletion of Input JSON file, because futher Transactions in other scripts required
  * to initialize the SC correctly. Last Script will delete the input JSON file
 

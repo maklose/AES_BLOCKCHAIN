@@ -71,6 +71,12 @@ function sendSignedTxToBlockchain(GasPrice, GasLimit, PrivateKey, FromAddress, T
     });
 }
 
+function wait(ms) {
+    var d = new Date();
+    var d2 = null;
+    do { d2 = new Date(); }
+    while (d2 - d < ms);
+}
 
 //-------------------------------------------------------------------------------------------------------------------//
 
@@ -111,12 +117,10 @@ var jsonInputData_m;
 //-------------------------------------------------------------------------------------------------------------------//
 // Maintenance Confirmation of Contract Partner (CP) / Service Provider
 
-jsonInputData = require(filePathCPMaintConfJson);
-jsonInputData_m = require(filePathMachineMaintConfJson);
-
 
 try {
     //txInputData
+    jsonInputData = require(filePathCPMaintConfJson);
     iToAddress = jsonInputData.confirmation1.SC_Address;
     iFromAddress = jsonInputData.confirmation1.Wallet1;
     iPrivateKey = jsonInputData.confirmation1.PrivateKeyW1;
@@ -130,31 +134,31 @@ try {
 catch (e) {
     console.log("");
     console.log("");
-    console.log("!!Error in Input JSON for CP confirm!!");
+    console.log("No confirmation by Contract Partner!");
     console.log("");
     console.log("");
     errorInputJson = true;
 }
 
 try {
+    jsonInputData_m = require(filePathMachineMaintConfJson);
     iToAddress_m = jsonInputData_m.confirmation1.SC_Address;
     iFromAddress_m = jsonInputData_m.confirmation1.Wallet1;
     iPrivateKey_m = jsonInputData_m.confirmation1.PrivateKeyW1;
     iMachineConfirm = jsonInputData_m.confirmation1.Data.FunctionSelector;
 
-    console.log("iToAddress: " + iToAddress_m);
-    console.log("iFromAddress: " + iFromAddress_m);
-    console.log("iPrivateKey: " + iPrivateKey_m);
+    console.log("iToAddress_m: " + iToAddress_m);
+    console.log("iFromAddress_m: " + iFromAddress_m);
+    console.log("iPrivateKey_m: " + iPrivateKey_m);
 
 } catch (e) {
     console.log("");
     console.log("");
-    console.log("!!Error in Input JSON for Machine confirm!!");
+    console.log("No confirmation by Machine!");
     console.log("");
     console.log("");
     errorInputJson_m = true;
 }
-
 
 if (errorInputJson == true) {
     //Input JSON with errors, no Transaction can be send to Blockchain
@@ -180,10 +184,11 @@ if (errorInputJson == true) {
         console.log("JSON Maintenance Confirmation found, but Maintenance " +
             "has not been confirmed within this file. No Transaction send to Smart Contract");
     }
-
+}
 
     //--------------------------------------------------------------------------------------//
     //2nd Transaction
+
 
     if (errorInputJson_m == true) {
         //Input JSON with errors, no Transaction can be send to Blockchain
@@ -211,5 +216,5 @@ if (errorInputJson == true) {
         }
 
 
-    }
 }
+
