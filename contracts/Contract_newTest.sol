@@ -1,6 +1,6 @@
 pragma solidity >=0.4.25 <0.7.0;
 
-contract CountAndDeposit {
+contract MaintenanceService {
     
     address payable contractOwner;
     address payable contractPartner;
@@ -236,3 +236,23 @@ contract CountAndDeposit {
                     
 }
 
+contract PayPerUse {
+    
+    address payable contractOwner;
+    address payable contractPartner;
+    address payable contractAddress;
+    uint stampPayment;
+    uint256 price;
+    uint256 machineHours;
+    
+    MaintenanceService ms;
+    
+    function addressContract(address _t) public {
+        ms = MaintenanceService(_t); 
+    }
+    
+    function getCount() public view returns (uint result) {
+        return ms.getCount();
+    }
+    
+}
