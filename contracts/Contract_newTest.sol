@@ -14,7 +14,6 @@ contract MaintenanceService {
     uint confPartner;
     uint stampOwner;
     uint stampPartner;
-    uint stampCertificate;
     uint serviceType;
     uint256 transferAmount;
     uint256 restAmount;
@@ -90,7 +89,6 @@ contract MaintenanceService {
         require (msg.sender == contractOwner);
         return stampPartner;
     }
-
 
 // HIER KANN MAN DEN STATUS DES CONTRACT PRÜFEN
 // ALLE GET FUNKTIONEN
@@ -170,15 +168,12 @@ contract MaintenanceService {
         transferAmount = ((0 + balanceLimit) * 10**18); // zu zahlender Betrag wird definiert
         contractPartner.transfer(transferAmount);       // Betrag wird überwiesen
      
-        stampCertificate = now; // speichert den timestamp des Zertifikats
-        
         emit certificate(contractOwner, 
                 contractPartner, 
                 ConfirmationOwner, 
                 stampOwner, 
                 ConfirmationPartner, 
-                stampPartner,
-                stampCertificate,
+                stampPartner, 
                 counterLimit, 
                 balanceLimit);
         this.refund();                                  // ruft die refund-Funktion auf
@@ -210,6 +205,7 @@ contract MaintenanceService {
     // Erst werden die Adressen auf Typ uint gemappt
     // Dann werden alle zertifikatsbezogenen Werte in einer Funktion ausgegeben
     function getCertificate() public view 
+
         returns (address, 
                 address, 
                 address, 
@@ -218,8 +214,16 @@ contract MaintenanceService {
                 uint, 
                 uint, 
                 uint, 
-                uint,
                 uint) {
+                    
+        require (
+            (msg.sender == contractOwner || msg.sender == contractPartner) && 
+            (ConfirmationOwner == 1) &&
+            (ConfirmationPartner == 1) &&
+            (((address(this).balance / 10**18) >= balanceLimit)) &&
+            ((balanceLimit != 0))
+        );
+        
         return (contractOwner, 
                 contractPartner, 
                 address(this), 
@@ -228,8 +232,7 @@ contract MaintenanceService {
                 counterLimit, 
                 balanceLimit, 
                 stampOwner, 
-                stampPartner,
-                stampCertificate);
+                stampPartner);
     }
 
     event certificate(address contractOwner, 
@@ -237,13 +240,11 @@ contract MaintenanceService {
                         uint ConfirmationOwner, 
                         uint stampOwner, 
                         uint ConfirmationPartner, 
-                        uint stampPartner,
-                        uint stampCertificate,
+                        uint stampPartner, 
                         uint counterLimit, 
                         uint balanceLimit);
-                    
-<<<<<<< HEAD
 }
+
 
 contract PayPerUse {
     
@@ -264,6 +265,5 @@ contract PayPerUse {
         return ms.getCount();
     }
     
-=======
->>>>>>> 231e083931deacab21904c5905883745f6d48284
 }
+

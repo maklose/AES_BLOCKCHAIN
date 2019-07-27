@@ -7,12 +7,9 @@ contract MaintenanceService {
     address payable contractAddress;
     uint256 ConfirmationOwner;
     uint256 ConfirmationPartner;
-<<<<<<< HEAD
     mapping(address => uint256) machineBalance;
     mapping(address => uint256) machineCounter;
-=======
     uint256 machineCounter;
->>>>>>> 939062b45d42783340ddd24951485b69f2b8c8ae
     uint counterLimit;
     uint balanceLimit;
     uint confOwner;
@@ -58,12 +55,9 @@ contract MaintenanceService {
     // (also der Maschine, die den Contract angelegt hat)
     function increase(uint256 input) public payable {
         require (msg.sender == contractOwner);
-<<<<<<< HEAD
         machineCounter[contractOwner] += input;
         machineBalance[contractOwner] +=msg.value;
-=======
         machineCounter += input;
->>>>>>> 939062b45d42783340ddd24951485b69f2b8c8ae
     }
     
     // Maschine schickt Bestätigung an Smart Contract (0 oder 1)
@@ -87,17 +81,14 @@ contract MaintenanceService {
          return stampOwner;
      }
      
-<<<<<<< HEAD
      function getStampPartner() public view returns (uint) {
          require (msg.sender == contractOwner);
          return stampPartner;
      }
-=======
     function getStampPartner() public view returns (uint) {
         require (msg.sender == contractOwner);
         return stampPartner;
     }
->>>>>>> 939062b45d42783340ddd24951485b69f2b8c8ae
 
 // HIER KANN MAN DEN STATUS DES CONTRACT PRÜFEN
 // ALLE GET FUNKTIONEN
@@ -148,13 +139,10 @@ contract MaintenanceService {
     // überprüft und gibt den Counter des owners
     // (also die Maschinenstunden der Maschine) zurück
     function getCount() public view returns (uint) {
-<<<<<<< HEAD
            require (msg.sender == contractOwner || msg.sender == contractPartner);
            return machineCounter[contractOwner];
-=======
         require (msg.sender == contractOwner || msg.sender == contractPartner);
         return machineCounter;
->>>>>>> 939062b45d42783340ddd24951485b69f2b8c8ae
     }
 
     // gibt Signal zurück, ob Maschinenbestätigung eingegangen ist, oder nicht
@@ -172,7 +160,6 @@ contract MaintenanceService {
     // überprüft, ob von beiden Parteien (Maschine und Dienstleister) die Bestätigungen eingegangen
     // sind
     // gibt Ja/Nein Wert aus
-<<<<<<< HEAD
     function checkConfirmationAndSendPayment() public  
     {
         require (msg.sender == contractOwner || msg.sender == contractPartner);
@@ -191,7 +178,6 @@ contract MaintenanceService {
                             counterLimit, 
                             balanceLimit);
         }
-=======
     function checkConfirmationAndSendPayment() public {
         require ((msg.sender == contractOwner || msg.sender == contractPartner) && 
                 (ConfirmationOwner == 1) &&
@@ -212,7 +198,6 @@ contract MaintenanceService {
                 balanceLimit);
         this.refund();                                  // ruft die refund-Funktion auf
                                                         // sendet Restbetrag an Owner 
->>>>>>> 939062b45d42783340ddd24951485b69f2b8c8ae
     }
     
 // zusätzliche Funktionen einschließlich der selfdestruct funktion als Abschluss der funktion
@@ -243,15 +228,12 @@ contract MaintenanceService {
                 uint, 
                 uint, 
                 uint, 
-<<<<<<< HEAD
                 uint) 
     {           
             require ((msg.sender == contractOwner || msg.sender == contractPartner) 
                 && (ConfirmationOwner == 1) 
                 && (ConfirmationPartner == 1));
-=======
                 uint) {
->>>>>>> 939062b45d42783340ddd24951485b69f2b8c8ae
         return (contractOwner, 
                 contractPartner, 
                 address(this), 
@@ -263,9 +245,7 @@ contract MaintenanceService {
                 stampPartner);
     }
 
-<<<<<<< HEAD
 }
-=======
     event certificate(address contractOwner, 
                         address contractPartner, 
                         uint ConfirmationOwner, 
@@ -277,4 +257,3 @@ contract MaintenanceService {
 }
 
 
->>>>>>> 939062b45d42783340ddd24951485b69f2b8c8ae
