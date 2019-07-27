@@ -14,6 +14,8 @@ contract MaintenanceService {
     uint confPartner;
     uint stampOwner;
     uint stampPartner;
+    uint blockConfirmationOwner;
+    uint blockConfirmationPartner;
     uint serviceType;
     uint256 transferAmount;
     uint256 restAmount;
@@ -67,6 +69,7 @@ contract MaintenanceService {
                     && (balanceLimit != 0));
         ConfirmationOwner = input;
         stampOwner = now;
+        blockConfirmationOwner = block.number;
     }
     
     // Dienstleister schickt Bestätigung an Smart Contract (0 oder 1)
@@ -78,6 +81,7 @@ contract MaintenanceService {
                     && (balanceLimit != 0));
         ConfirmationPartner = input;
         stampPartner = now;
+        blockConfirmationPartner = block.number;
     }
     
     function getStampOwner() public view returns (uint)  {
@@ -175,7 +179,9 @@ contract MaintenanceService {
                 ConfirmationPartner, 
                 stampPartner, 
                 counterLimit, 
-                balanceLimit);
+                balanceLimit,
+                blockConfirmationOwner,
+                blockConfirmationPartner);
         this.refund();                                  // ruft die refund-Funktion auf
                                                         // sendet Restbetrag an Owner 
     }
@@ -214,14 +220,15 @@ contract MaintenanceService {
                 uint, 
                 uint, 
                 uint, 
-                uint) {
+                uint,
+                uint,
+                uint
+                ) {
                     
         require (
             (msg.sender == contractOwner || msg.sender == contractPartner) && 
             (ConfirmationOwner == 1) &&
-            (ConfirmationPartner == 1) &&
-            (((address(this).balance / 10**18) >= balanceLimit)) &&
-            ((balanceLimit != 0))
+            (ConfirmationPartner == 1)
         );
         
         return (contractOwner, 
@@ -232,7 +239,9 @@ contract MaintenanceService {
                 counterLimit, 
                 balanceLimit, 
                 stampOwner, 
-                stampPartner);
+                stampPartner,
+                blockConfirmationOwner,
+                blockConfirmationPartner);
     }
 
     event certificate(address contractOwner, 
@@ -242,7 +251,10 @@ contract MaintenanceService {
                         uint ConfirmationPartner, 
                         uint stampPartner, 
                         uint counterLimit, 
-                        uint balanceLimit);
+                        uint balanceLimit,
+                        uint blockConfirmationOwner,
+                        uint blockConfirmationPartner
+                        );
 }
 
 
