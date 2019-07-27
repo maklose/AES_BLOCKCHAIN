@@ -20,11 +20,7 @@ var handleReceipt = (error, receipt) => {
 
 //2. Function: Delete JSON File from Directory
 function deleteJSONfile(filePath) {
-<<<<<<< HEAD
-  //fs.unlink(filePath, function (err) {});
-=======
-  fs.unlink(filePath, function (err) { });
->>>>>>> 939062b45d42783340ddd24951485b69f2b8c8ae
+  fs.unlink(filePath, function (err) {});
   console.log('JSON File deleted');
 }
 
@@ -35,7 +31,7 @@ function sendSignedTxToBlockchain(GasPrice, GasLimit, PrivateKey, FromAddress, T
 
   //prepare values to Hex Code
   value = web3.utils.toHex(web3.utils.toWei(EthValue.toString(), "ether"));
-
+  
   //1st Calculate Nonce:
   web3.eth.getTransactionCount(FromAddress, 'pending', (err, txCount) => {
     //Estimate Gas Price
@@ -81,7 +77,7 @@ function sendSignedTxToBlockchain(GasPrice, GasLimit, PrivateKey, FromAddress, T
 
 //Path has to be adapted to every PC
 var configInput = require('C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_202/To_appjs/appjs_config.json');
-var filePathWorkHoursJson = configInput.variables.filePathM202_To_appjs + 'working_hours.json';
+var filePathWorkHoursJson = configInput.variables.filePathM202_To_appjs + 'WorkHours_SAP2BC.json';
 
 //Declaration of single variables for Raw Transaction Data
 var GasPrice = configInput.variables.SC_GasPrice;
@@ -106,11 +102,13 @@ var rawTx;
 
 //- While einbauen für Tx1,Tx2,Tx3,... einlesen von WorkingHours
 
+jsonInputData =
+  require(filePathWorkHoursJson);
+console.log("Start read JSON Working Hours");
+
 try {
 
   //Tx Data
-  jsonInputData = require(filePathWorkHoursJson);
-
   iPrivateKey = jsonInputData.Tx1.PrivateKey_Machine_W;
   iFromAddress = jsonInputData.Tx1.Machine_Wallet;
   iToAddress = jsonInputData.Tx1.SC_Address;

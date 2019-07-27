@@ -20,7 +20,11 @@ var handleReceipt = (error, receipt) => {
 //2. Function: Delete JSON File from Directory
 
 function deleteJSONfile(filePath) {
+<<<<<<< HEAD
     //fs.unlink(filePath, function (err) {});
+=======
+    fs.unlink(filePath, function (err) { });
+>>>>>>> 939062b45d42783340ddd24951485b69f2b8c8ae
     console.log('JSON File deleted');
 }
 
@@ -103,11 +107,11 @@ var rawTx;
 //-------------------------------------------------------------------------------------------------------------------//
 //initialize new Smart Contracts --> set MaintenanceCosts as BalanceLimit
 
-jsonInputData = require(filePathCreateSC);
-jsonSCAddress = require(filePathNewSCaddr);
-
 try {
     //txInputData
+    jsonInputData = require(filePathCreateSC);
+    jsonSCAddress = require(filePathNewSCaddr);
+
     iToAddress = jsonSCAddress.SC_Address;
     iFromAddress = jsonInputData.NewContract.Machine_Wallet;
     iPrivateKey = jsonInputData.NewContract.PrivateKey_Machine_W;
