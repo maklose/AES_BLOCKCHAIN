@@ -7,7 +7,7 @@ contract MaintenanceService {
     address payable contractAddress;
     uint256 ConfirmationOwner;
     uint256 ConfirmationPartner;
-    mapping(address => uint256) machineCounter;
+    uint256 machineCounter;
     uint counterLimit;
     uint balanceLimit;
     uint confOwner;
@@ -57,7 +57,7 @@ contract MaintenanceService {
     // (also der Maschine, die den Contract angelegt hat)
     function increase(uint256 input) public payable {
         require (msg.sender == contractOwner);
-        machineCounter[contractOwner] += input;
+        machineCounter += input;
     }
     
     // Maschine schickt Bestätigung an Smart Contract (0 oder 1)
@@ -144,7 +144,7 @@ contract MaintenanceService {
     // (also die Maschinenstunden der Maschine) zurück
     function getCount() public view returns (uint) {
         require (msg.sender == contractOwner || msg.sender == contractPartner);
-        return machineCounter[contractOwner];
+        return machineCounter;
     }
 
     // gibt Signal zurück, ob Maschinenbestätigung eingegangen ist, oder nicht
