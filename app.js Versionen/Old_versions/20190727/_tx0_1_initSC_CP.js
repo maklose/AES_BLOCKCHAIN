@@ -20,7 +20,11 @@ var handleReceipt = (error, receipt) => {
 //2. Function: Delete JSON File from Directory
 
 function deleteJSONfile(filePath) {
+<<<<<<< HEAD
+    //fs.unlink(filePath, function (err) {});
+=======
     fs.unlink(filePath, function (err) { });
+>>>>>>> 939062b45d42783340ddd24951485b69f2b8c8ae
     console.log('JSON File deleted');
 }
 
@@ -76,10 +80,9 @@ function sendSignedTxToBlockchain(GasPrice, GasLimit, PrivateKey, FromAddress, T
 
 //Path has to be adapted to every PC
 var configInput = require('C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_202/To_appjs/appjs_config.json');
-var filePathNewSCaddr = configInput.variables.filePathM202_To_SAP + 'new_sc_address.json';
-var filePathCreateSC = configInput.variables.filePathM202_To_appjs + 'new_sc.json';
+var filePathNewSCaddr = configInput.variables.filePathM202_To_SAP + 'newSC_Address_appjs.json';
+var filePathCreateSC = configInput.variables.filePathM202_To_appjs + 'CreateMaintContract.json';
 var iValue_0 = configInput.variables.iValue_0;
-console.log('ivalue0:' + iValue_0)
 
 //Declaration of single variables for Raw Transaction Data
 var GasPrice = configInput.variables.SC_GasPrice;
@@ -88,7 +91,7 @@ var GasLimit = configInput.variables.SC_GasLimit;
 
 var iToAddress;
 var iFromAddress;
-var iCounterLimitHours;
+var iContractPartner;
 var value;
 var iPrivateKey;
 var iData;
@@ -103,7 +106,8 @@ var rawTx;
 
 
 //-------------------------------------------------------------------------------------------------------------------//
-//initialize new Smart Contracts --> set CounterLimit (for Working Hours)
+//initialize new Smart Contracts --> set ContractPartner
+
 
 
 try {
@@ -114,12 +118,13 @@ try {
     iToAddress = jsonSCAddress.SC_Address;
     iFromAddress = jsonInputData.NewContract.Machine_Wallet;
     iPrivateKey = jsonInputData.NewContract.PrivateKey_Machine_W;
-    iCounterLimitHours = jsonInputData.NewContract.CounterLimitHours;
+    iContractPartner = jsonInputData.NewContract.CP_Wallet;
+    iValue_0 = 0;
 
     console.log("iToAddress: " + iToAddress);
     console.log("iFromAddress: " + iFromAddress);
     console.log("iPrivateKey: " + iPrivateKey);
-    console.log("iCounterLimitHours: " + iCounterLimitHours);
+    console.log("CP: " + iContractPartner);
 
 }
 catch (e) {
@@ -135,12 +140,14 @@ if (errorInputJson == true) {
     //Input JSON with errors, no Transaction can be send to Blockchain
 } else {
     //proceed sending initializing Transactions to SC
+    iData = '';
 
     //Define ContractPartner
     iData = web3.eth.abi.encodeFunctionCall({
-        name: 'setCounterLimit', type: 'function',
-        inputs: [{ type: 'uint256', name: 'input' }]
-    }, [iCounterLimitHours]);
+        name: 'setContractPartner', type: 'function',
+        inputs: [{ type: 'address', name: 'input' }]
+    }, [iContractPartner]);
+
     sendSignedTxToBlockchain(GasPrice, GasLimit, iPrivateKey, iFromAddress, iToAddress,
         iValue_0, iData);
 }
