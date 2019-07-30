@@ -1,0 +1,13 @@
+{
+  "Certificate": [
+    {
+      "Date": "20190727",
+      "Machine_Wallet": "0xf6b7aef42305a4a24fbd28db9b7376c2267fcd3a",
+      "Vendor_Wallet": "0x3ec7ef9696d5bbedff3688cc76bc3e05a06c7e55",
+      "SmartContract": "0x0d1803e899ae34af9575f1f7a1c7aa568524801b",
+      "Counter_Limit": 20,
+      "MaintenanceCost": 2,
+      "WorkingHours": 27
+    }
+  ]
+}
