@@ -145,3 +145,4 @@ if (errorInputJson == true) {
     deleteJSONfile(filePathCreateSC);
     console.log("SC deployment & initialization finished. JSON input deleted!");
 }
+
