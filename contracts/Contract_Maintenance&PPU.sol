@@ -66,7 +66,6 @@ contract CountAndDeposit {
         machineCounter += input;
         transferAmountPPU = (input * price);
         contractPartner.transfer(transferAmountPPU * 10**18);
-        this.refund;
     }
     
     // Maschine schickt Bestätigung an Smart Contract (0 oder 1)
