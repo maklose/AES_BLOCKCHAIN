@@ -177,6 +177,9 @@ if (errorInputJson == true) {
         console.log("ContractPartner/Service Provider has confirmed Maintenance "
             + "via JSON file. Confirmation Transaction send to Smart Contract!");
 
+        //delete input JSON file
+        deleteJSONfile(filePathCPMaintConfJson);
+        console.log('CP confirmation json deleted');
     } else {
         console.log("JSON Maintenance Confirmation found, but Maintenance " +
             "has not been confirmed within this file. No Transaction send to Smart Contract");
@@ -203,10 +206,15 @@ if (errorInputJson == true) {
 
             console.log("Machine has confirmed Maintenance "
                 + "via JSON file. Confirmation Transaction send to Smart Contract!");
+
+            //delete input JSON file
+            deleteJSONfile(filePathMachineMaintConfJson);
+            console.log('Machine confirmation json deleted');
         } else {
             console.log("JSON Maintenance Confirmation found, but Maintenance " +
                 "has not been confirmed within this file. No Transaction send to Smart Contract");
         }
+
 
 }
 

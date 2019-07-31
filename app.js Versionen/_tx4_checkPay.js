@@ -81,9 +81,11 @@ function wait(ms) {
 //-------------------------------------------------------------------------------------------------------------------//
 
 //Path has to be adapted to every PC
+
 var configInput = require('C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_202/To_appjs/appjs_config.json');
 var filePathCPMaintConfJson = configInput.variables.filePathM203_To_appjs + 'confirm_h.json';
 var filePathMachineMaintConfJson = configInput.variables.filePathM202_To_appjs + 'confirm_m.json';
+var filePathCertificate = configInput.variables.filePathM202_To_SAP + 'certificate.json';
 
 //Declaration of single variables for Raw Transaction Data
 var GasPrice = configInput.variables.SC_GasPrice;
@@ -103,20 +105,12 @@ var privateKey;
 var tx;
 var serializedTx;
 var rawTx;
-
-//for Machine confirm (so variables cannot be overwritten from first transaction)
-var iToAddress_m;
-var iFromAddress_m;
-var iPrivateKey_m;
-var iData_m;
-var iMachineConfirm;
-var errorInputJson_m = new Boolean(false);
-var jsonInputData_m;
-
-
-//-------------------------------------------------------------------------------------------------------------------//
-// Maintenance Confirmation of Contract Partner (CP) / Service Provider
-
+var certMachineAddr;
+var certCPAddr;
+var certSCAddr;
+var certMoneyLimit;
+var certCouterLimit;
+var certDate = new Date();
 
 try {
     //txInputData
@@ -140,73 +134,123 @@ catch (e) {
     errorInputJson = true;
 }
 
-try {
-    jsonInputData_m = require(filePathMachineMaintConfJson);
-    iToAddress_m = jsonInputData_m.confirmation1.SC_Address;
-    iFromAddress_m = jsonInputData_m.confirmation1.Wallet1;
-    iPrivateKey_m = jsonInputData_m.confirmation1.PrivateKeyW1;
-    iMachineConfirm = jsonInputData_m.confirmation1.Data.FunctionSelector;
-
-    console.log("iToAddress_m: " + iToAddress_m);
-    console.log("iFromAddress_m: " + iFromAddress_m);
-    console.log("iPrivateKey_m: " + iPrivateKey_m);
-
-} catch (e) {
-    console.log("");
-    console.log("");
-    console.log("No confirmation by Machine!");
-    console.log("");
-    console.log("");
-    errorInputJson_m = true;
-}
-
-if (errorInputJson == true) {
-    //Input JSON with errors, no Transaction can be send to Blockchain
-} else {
-
-    //check if confirmation has been send via JSON
-    if (iPartnerConfirm == 'machineConfirm') {
-
-        //Set Confirmation of
-        iData = web3.eth.abi.encodeFunctionCall({ name: 'setConfirmationPartner', type: 'function', inputs: [{ type: 'uint256', name: 'input' }] },
-            ['1']);
-
-        sendSignedTxToBlockchain(GasPrice, GasLimit, iPrivateKey, iFromAddress, iToAddress,
-            iValue_0, iData);
-
-        console.log("ContractPartner/Service Provider has confirmed Maintenance "
-            + "via JSON file. Confirmation Transaction send to Smart Contract!");
-
-    } else {
-        console.log("JSON Maintenance Confirmation found, but Maintenance " +
-            "has not been confirmed within this file. No Transaction send to Smart Contract");
-    }
-}
-
-    //--------------------------------------------------------------------------------------//
-    //2nd Transaction
+//check Maintenance Confirmation at SCs at trigger payment (if SC check is ok)
 
 
-    if (errorInputJson_m == true) {
-        //Input JSON with errors, no Transaction can be send to Blockchain
-    } else {
+iData = web3Abi.encodeFunctionSignature('checkConfirmationAndSendPayment()');
 
-        //check if confirmation has been send via JSON
-        if (iMachineConfirm == 'machineConfirm') {
+//1st Calculate Nonce:
+web3.eth.getTransactionCount(iFromAddress, 'pending', (err, txCount) => {
+    //Estimate Gas Price
+    web3.eth.estimateGas({ to: iToAddress, data: iData },
+        (err, gasEstimate) => {
 
-            //Set Confirmation of
-            iData_m = web3.eth.abi.encodeFunctionCall({ name: 'setConfirmationOwner', type: 'function', inputs: [{ type: 'uint256', name: 'input' }] },
-                ['1']);
+            //Create Transaction Object with raw data
+            var rawTx = {
+                nonce: web3.utils.toHex(txCount),
+                from: iFromAddress,
+                to: iToAddress,
+                gasPrice: web3.utils.toHex(GasPrice.toString()),
+                gasLimit: web3.utils.toHex(GasLimit.toString()),
+                value: iValue_0,
+                data: iData
+            };
 
-            sendSignedTxToBlockchain(GasPrice, GasLimit, iPrivateKey_m, iFromAddress_m, iToAddress_m,
-                iValue_0, iData_m);
+            //digital signature
+            var privateKey = new Buffer(iPrivateKey, 'hex');
+            var tx = new Tx(rawTx);
+            tx.sign(privateKey);
 
-            console.log("Machine has confirmed Maintenance "
-                + "via JSON file. Confirmation Transaction send to Smart Contract!");
+            //send signed Transaction to Blockchain
+            var serializedTx = tx.serialize();
+            web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), (err, result) => {
+                if (err) {
+                    console.log(err); return;
+                }
+
+
+            });
+        });
+
+});
+//delete input JSON file
+deleteJSONfile(filePathCPMaintConfJson);
+console.log('CP confirmation json deleted');
+
+//--------------------------------------------------------------------------------------//
+// Check Smart Contract for a new Certificate
+
+web3.eth.call({ from: iFromAddress, to: iToAddress, data: web3Abi.encodeFunctionSignature('getCertificate()') },
+    (err, certificate) => {
+
+        if (certificate == '0x') {
+            //certificate not available
         } else {
-            console.log("JSON Maintenance Confirmation found, but Maintenance " +
-                "has not been confirmed within this file. No Transaction send to Smart Contract");
+            //certificate available
+
+            finalString = certificate.toString();
+            var dd = String(certDate.getDate()).padStart(2, '0');
+            var mm = String(certDate.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var yyyy = certDate.getFullYear();
+
+            certDate = yyyy + mm + dd;
+
+            certMachineAddr = '0x' + finalString.substring(26, 66);
+            certCPAddr = '0x' + finalString.substring(90, 130);
+
+            certSCAddr = '0x' + finalString.substring(154, 194);
+
+            var hex_CounterLimit = finalString.substring(362, 386);
+            certCouterLimit = web3.utils.hexToNumber('0x' + hex_CounterLimit);
+
+
+            //Kommastellen abfangen
+            var help_MoneyLimit = finalString.substring(438, 450);
+
+            certMoneyLimit = web3.utils.toDecimal(help_MoneyLimit);
+            console.log('Money Limit: ' + certMoneyLimit);
+
+            //Get current count of Working Hours
+            web3.eth.call({
+                from: certMachineAddr,
+                to: certSCAddr,
+                data: web3Abi.encodeFunctionSignature('getCount()')
+            },
+                (err, machineCounter) => {
+                    countedWorkingHours = web3.utils.toDecimal(machineCounter);
+
+
+
+
+                    //Create JSON File here with certificate data
+
+
+                    var obj = { Certificate: [] };
+                    obj.Certificate.push({
+                        "Date": certDate,
+                        "Machine_Wallet": certMachineAddr,
+                        "Vendor_Wallet": certCPAddr,
+                        "SmartContract": certSCAddr,
+                        "Counter_Limit": certCouterLimit,
+                        "MaintenanceCost": certMoneyLimit,
+                        "WorkingHours": countedWorkingHours
+
+                    });
+
+                    var json = JSON.stringify(obj, null, 2);
+                    fs.writeFile(filePathCertificate,
+                        json, 'utf8', function (err) { if (err) throw err; });
+                    console.log("New Certificate created!");
+                });
+
         }
 
-}
+    });
+
+
+
+//delete input JSON file
+deleteJSONfile(filePathMachineMaintConfJson);
+console.log('Machine confirmation json deleted');
+
 

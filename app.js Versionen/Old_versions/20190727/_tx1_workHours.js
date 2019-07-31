@@ -20,7 +20,11 @@ var handleReceipt = (error, receipt) => {
 
 //2. Function: Delete JSON File from Directory
 function deleteJSONfile(filePath) {
+<<<<<<< HEAD
+  //fs.unlink(filePath, function (err) {});
+=======
   fs.unlink(filePath, function (err) { });
+>>>>>>> 939062b45d42783340ddd24951485b69f2b8c8ae
   console.log('JSON File deleted');
 }
 
@@ -134,7 +138,7 @@ try {
 catch (e) {
   console.log("");
   console.log("");
-  console.log("No Transactions send to Blockchain!");
+  console.log("!!Error in Input JSON!! No Transactions send to Blockchain!!");
   console.log("");
   console.log("");
   errorInputJson = true;
@@ -156,4 +160,3 @@ if (errorInputJson == true) {
   deleteJSONfile(filePathWorkHoursJson);
   jsonInputData = "";
 }
-

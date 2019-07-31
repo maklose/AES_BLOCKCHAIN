@@ -20,11 +20,7 @@ var handleReceipt = (error, receipt) => {
 //2. Function: Delete JSON File from Directory
 
 function deleteJSONfile(filePath) {
-<<<<<<< HEAD
-    //fs.unlink(filePath, function (err) {});
-=======
     fs.unlink(filePath, function (err) { });
->>>>>>> 939062b45d42783340ddd24951485b69f2b8c8ae
     console.log('JSON File deleted');
 }
 
@@ -80,8 +76,8 @@ function sendSignedTxToBlockchain(GasPrice, GasLimit, PrivateKey, FromAddress, T
 
 //Path has to be adapted to every PC
 var configInput = require('C:/Users/demoerc/dropbox_uni/Dropbox/AES_File_Exchange/Mandant_202/To_appjs/appjs_config.json');
-var filePathNewSCaddr = configInput.variables.filePathM202_To_SAP + 'newSC_Address_appjs.json';
-var filePathCreateSC = configInput.variables.filePathM202_To_appjs + 'CreateMaintContract.json';
+var filePathNewSCaddr = configInput.variables.filePathM202_To_SAP + 'new_sc_address.json';
+var filePathCreateSC = configInput.variables.filePathM202_To_appjs + 'new_sc.json';
 
 //Declaration of single variables for Raw Transaction Data
 var GasPrice = configInput.variables.SC_GasPrice;
@@ -149,3 +145,4 @@ if (errorInputJson == true) {
     deleteJSONfile(filePathCreateSC);
     console.log("SC deployment & initialization finished. JSON input deleted!");
 }
+
