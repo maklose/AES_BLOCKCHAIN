@@ -35,11 +35,11 @@ contract PayPerUse {
         require ((msg.sender == contractOwner));
         machineCounter += input;
         transferAmount = (input * price);
-        contractPartner.transfer(transferAmount * 10**18);
+        contractPartner.transfer(transferAmount);
     }   
     
     function payService() public payable{
-        contractPartner.transfer(transferAmount * 10**18);
+        contractPartner.transfer(transferAmount);
     }
     
     // überprüft und gibt die Balance des owners 
