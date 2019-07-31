@@ -36,10 +36,16 @@ contract PayPerUse {
         machineCounter += input;
         transferAmount = (input * price);
         contractPartner.transfer(transferAmount);
+        this.refund;
     }   
     
     function payService() public payable{
         contractPartner.transfer(transferAmount);
+    }
+
+    function refund() public payable {
+        restAmount = (address(this).balance);
+        contractOwner.transfer(restAmount);
     }
     
     // überprüft und gibt die Balance des owners 
