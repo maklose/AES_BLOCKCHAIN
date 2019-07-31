@@ -45,8 +45,7 @@ library SafeMath {
     }
 }
 
-
-    contract PayPerUse {
+contract PayPerUse {
     
     using SafeMath for uint256;
  
@@ -82,12 +81,9 @@ library SafeMath {
     function increase(uint256 input) public payable {
         require ((msg.sender == contractOwner));
         machineCounter += input;
-        transferAmount = (machineCounter * price);
+        transferAmount = (input * price);
         contractPartner.transfer(transferAmount * 10**18);
-    }
-    
-    function getTransferAmount() public view returns (uint) {
-        return transferAmount;
+        this.refund;
     }
     
     function payService() public payable{
@@ -99,7 +95,7 @@ library SafeMath {
         contractOwner.transfer(restAmount);
     }
     
-     // überprüft und gibt die Balance des owners 
+    // überprüft und gibt die Balance des owners 
     // (also die Einzahlungen der Maschine) zurück
     function getBalance() public view returns (uint) {
         require (msg.sender == contractOwner || msg.sender == contractPartner);
