@@ -1,13 +1,12 @@
 pragma solidity >=0.4.25 <0.7.0;
 
-contract CountAndDeposit {
+contract MaintenanceService {
     
     address payable contractOwner;
     address payable contractPartner;
     address payable contractAddress;
     uint256 ConfirmationOwner;
     uint256 ConfirmationPartner;
-    mapping(address => uint256) machineBalance;
     mapping(address => uint256) machineCounter;
     uint counterLimit;
     uint balanceLimit;
@@ -16,6 +15,8 @@ contract CountAndDeposit {
     uint stampOwner;
     uint stampPartner;
     uint serviceType;
+    uint256 transferAmount;
+    uint256 restAmount;
 
     
     
@@ -55,7 +56,6 @@ contract CountAndDeposit {
     function increase(uint256 input) public payable {
         require (msg.sender == contractOwner);
         machineCounter[contractOwner] += input;
-        machineBalance[contractOwner] +=msg.value;
     }
     
     // Maschine schickt Bestätigung an Smart Contract (0 oder 1)
@@ -158,28 +158,16 @@ contract CountAndDeposit {
     // überprüft, ob von beiden Parteien (Maschine und Dienstleister) 
     // die Bestätigungen eingegangen sind
     // gibt Ja/Nein Wert aus
-    function checkConfirmationAndSendPayment() public 
-        returns (address addressOwner, 
-            address addressPartner, 
-            address addressContract, 
-            uint256 OwnerConfirmation, 
-            uint TimestampOwnerConfirmation, 
-            uint256 PartnerConfirmation, 
-            uint TimestampPartnerConfirmation, 
-            uint LimitCounter, 
-            uint LimitBalance) {
-        require (msg.sender == contractOwner || msg.sender == contractPartner);
-            if (ConfirmationOwner == 1 
-                && ConfirmationPartner == 1 
-                && ((address(this).balance / 10**18) >= balanceLimit) 
-                && (balanceLimit != 0)) {
-        uint transferAmount = balanceLimit;
-        uint restAmount = machineBalance[contractOwner] - balanceLimit;
-        machineBalance[contractOwner] = 0;
-        
-        contractPartner.transfer(transferAmount);
-        contractOwner.transfer(restAmount);
-         
+    function checkConfirmationAndSendPayment() public {
+        require ((msg.sender == contractOwner || msg.sender == contractPartner) && 
+                (ConfirmationOwner == 1) &&
+                (ConfirmationPartner == 1) &&
+                (((address(this).balance / 10**18) >= balanceLimit)) &&
+                ((balanceLimit != 0))
+        );
+        transferAmount = ((0 + balanceLimit) * 10**18); // zu zahlender Betrag wird definiert
+        contractPartner.transfer(transferAmount);       // Betrag wird überwiesen
+     
         emit certificate(contractOwner, 
                 contractPartner, 
                 ConfirmationOwner, 
@@ -188,16 +176,18 @@ contract CountAndDeposit {
                 stampPartner, 
                 counterLimit, 
                 balanceLimit);
-        return (contractOwner, 
-                contractPartner, 
-                address(this), 
-                ConfirmationOwner, 
-                stampOwner, 
-                ConfirmationPartner, 
-                stampPartner, 
-                counterLimit, 
-                balanceLimit);
-        }
+        this.refund();                                  // ruft die refund-Funktion auf
+                                                        // sendet Restbetrag an Owner 
+    }
+    
+    function payService() public {
+        transferAmount = ((0 + balanceLimit) * 10**18);
+        contractPartner.transfer(transferAmount);
+    }
+    
+    function refund() public payable {
+        restAmount = (address(this).balance);
+        contractOwner.transfer(restAmount);
     }
     
 
@@ -205,7 +195,8 @@ contract CountAndDeposit {
     // in Höhe des Smart Contrat Limits
     function checkBalanceLimit() public view returns (uint) {
         require (msg.sender == contractOwner || msg.sender == contractPartner);
-        if (((address(this).balance / 10**18) >= balanceLimit) && (balanceLimit != 0)) return (1);
+        if (((address(this).balance / 10**18) >= balanceLimit) 
+            && (balanceLimit != 0)) return (1);
         else return (0);
     }
     
@@ -223,7 +214,6 @@ contract CountAndDeposit {
                 uint, 
                 uint, 
                 uint) {
-            
         return (contractOwner, 
                 contractPartner, 
                 address(this), 
@@ -234,6 +224,7 @@ contract CountAndDeposit {
                 stampOwner, 
                 stampPartner);
     }
+
     event certificate(address contractOwner, 
                         address contractPartner, 
                         uint ConfirmationOwner, 
@@ -242,73 +233,4 @@ contract CountAndDeposit {
                         uint stampPartner, 
                         uint counterLimit, 
                         uint balanceLimit);
-                        
-    function testCertificate() public {
-        emit certificate(contractOwner, 
-                            contractPartner, 
-                            ConfirmationOwner, 
-                            stampOwner, 
-                            ConfirmationPartner, 
-                            stampPartner, 
-                            counterLimit, 
-                            balanceLimit);
-    }
-
-}
-
-
-
-
-
-contract PayPerUse {
-    
-    address payable machineOwner;
-    address payable machineUser;
-    address payable contractAddress;
-    mapping(address => uint256) machineBalance;
-    mapping(address => uint256) machineCounter;
-    uint machinePaymentRate;
-    
-    
-    // HIER DEFINIEREN WIR DEN CONTRACT
-     // hier wird der contractOwner definiert
-     // geschieht bei der Erstellung der Contract-Instanz
-     constructor() public {
-         machineOwner = msg.sender;
-     }
-     
-     // HIER DEFINIEREN WIR UNSERE INPUT VARIABLEN     
-     // hier wird der contractPartner definiert
-     // kann nur vom contractOwner definiert werden
-     function setMachineUser(address payable input) public {
-         require (msg.sender == machineOwner);
-         machineUser = input;
-     }
-     
-     // setzt den Stundesatz der für eine Maschinenstunde gezahlt wird fest
-     function setMachinePaymentRate(uint input) public {
-         require (msg.sender == machineOwner);
-         machinePaymentRate = input; 
-     }
-     
-    
-    // erhöht Counter für Maschinenstunden und balance des owners
-    // (also der Maschine, die den Contract angelegt hat)
-    // führt im Anschluss Zahlung an den Hersteller aus, in Höhe des errechneten Betrages aus machineCounter*machinePaymentRate
-    function increase(uint256 input) public payable {
-        require (msg.sender == machineUser);
-        machineCounter[machineUser] += input;
-        machineBalance[machineUser] +=msg.value; //notwendig??
-        machineOwner.transfer(address(this).balance*machinePaymentRate);
-    }
-    
-    
-    CountAndDeposit cd;
-    
-    // gibt das aktuelle Stundeskonto der Maschine wieder (greift auf den anderen SC zurück)
-    function getMachineHours(address _contractAddress) public returns (uint) {
-        cd = CountAndDeposit(_contractAddress);
-        return cd.getCount();
-    }
-    
 }
